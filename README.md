@@ -36,7 +36,8 @@ This repo is the **source of truth** for prompt specifications, playbook docs, c
 
 ### 2. Playbook
 Living knowledge base built over trades:  
-- **strategies/** → entry/exit rules, scaling, invalidation logic.  
+- **strategies/tpo/** → entry/exit rules, scaling, invalidation logic.  
+- **strategies/ic/** → entry/exit rules, scaling, invalidation logic.  
 - **evidence/** → annotated examples from real trading.
 
 ---
