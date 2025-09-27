@@ -54,13 +54,16 @@ Living knowledge base built over trades:
 
 ---
 
+### 5. data
+- ** -> NQ,ES,YM current data set
+
 ## 🔄 Workflow
 
 1. Prompts are **immutable** once tagged (`v9.0`, `v9.1`, `v9.3`).  
 2. Any upgrade → create new file (`v9.4.md`) + update changelog.  
 3. Playbook grows continuously from live trading evidence.  
 4. Guidebooks and diagrams exported into `/docs`.  
-
+5. files under data are for NQ,ES,YM respectively
 ---
 
 ## ⚖️ License
