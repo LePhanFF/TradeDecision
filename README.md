@@ -58,6 +58,10 @@ Living knowledge base built over trades:
 ### 5. data
 - ** -> NQ,ES,YM current data set
 
+
+### 6. references
+- James_Dalton-Markets_in_Profile-EN.pdf
+
 ## 🔄 Workflow
 
 1. Prompts are **immutable** once tagged (`v9.0`, `v9.1`, `v9.3`).  
