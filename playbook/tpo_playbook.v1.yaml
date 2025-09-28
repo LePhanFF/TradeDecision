@@ -1,0 +1,224 @@
+meta:
+  name: TPO Core Playbook
+  version: 1
+  updated: 2025-09-27
+  description: >-
+    Actionable playbook for Dalton-style TPO day types with auction-theory evidence,
+    trading plans, and invalidation rules. Designed for V9.2.1 engine.
+
+defaults:
+  tick_size:
+    ES: 0.25
+    NQ: 0.25
+    YM: 1.0
+  acceptance_rule:
+    bars_required: 2
+    timeframe: "5m"
+    confirm_checkpoint_15m: true
+  auction_acceptance_hold_rule:
+    hold_minutes: 60
+    also_hold_into: "13:00"
+  risk:
+    base_risk_usd: 400
+    stop_buffer_atr: 0.5
+    tp1_R_multiple: 2
+    time_gate:
+      enable: true
+      not_before: "10:30"
+
+thresholds:
+  poc_pos_top: 0.66
+  poc_pos_bottom: 0.34
+  va_ratio_balanced_max: 0.55
+  ib_ext_trend_min: 0.25
+  bimodality_hvn_gap_frac: 0.20
+  lvn_depth_max_of_small_hvn: 0.30
+
+day_types:
+  D:
+    label: "D (Balance)"
+    description: >-
+      Balanced auction; expect rotations VAL↔POC↔VAH. POC often magnet.
+    evidence_required:
+      - "va_ratio <= va_ratio_balanced_max"
+      - "ib_ext.up < ib_ext_trend_min and ib_ext.dn < ib_ext_trend_min"
+      - "poc_slope_15m.direction == flat"
+      - "bimodality.is_bimodal == false"
+    trade_plan:
+      long_setups:
+        - name: "VAL Acceptance Long"
+          triggers:
+            - "Acceptance above VAL (2 closes; 15m checkpoint agrees)"
+          entry: "Retest VAL with confirmation"
+          stop: "Below VAL − 0.5×ATR(5m) or swing low"
+          targets: ["TP1 at POC", "TP2 toward VAH or nearest HVN above"]
+          management: ["Reduce if stall at POC; re-add on acceptance above POC"]
+      short_setups:
+        - name: "VAH Rejection Short"
+          triggers:
+            - "Rejection at VAH (probe fails; no acceptance)"
+          entry: "Retest VAH rejection wick"
+          stop: "Above VAH + 0.5×ATR(5m) or swing high"
+          targets: ["TP1 at POC", "TP2 toward VAL or nearest HVN below"]
+          management: ["If acceptance above POC occurs, reduce risk"]
+      notes:
+        - "Avoid mid-profile initiations; trade edges or post-BOS + acceptance."
+        - "Respect 10:30 gate for counter-trend fades."
+    invalidation_day:
+      - "POC migrates strongly (directional) + IB extension crosses trend min with acceptance"
+      - "Gap-Closure Warning against initial read + POC slope disagreement"
+    invalidation_trade:
+      - "Acceptance beyond your edge (VAL/VAH) against position"
+      - "Opposite LVN fills and holds (no rejection)"
+    lvn_hvn_usage:
+      hvn: "Magnets/scale; stalls/rotations common at HVNs."
+      lvn: "Rejection lines and trail references; acceleration risk through LVNs."
+
+  P:
+    label: "P (Top-Heavy)"
+    description: "Upper distribution; trend-up/short-covering tone."
+    evidence_required:
+      - "poc_pos_0to1 >= poc_pos_top"
+      - "ib_ext.up >= ib_ext_trend_min"
+      - "va_ratio <= va_ratio_balanced_max"
+      - "poc_slope_15m.direction == higher"
+    trade_plan:
+      long_setups:
+        - name: "Pullback to POC/VAL with Hold"
+          triggers:
+            - "Acceptance at/above POC after pullback"
+            - "POC migrating up on 15m checkpoints"
+          entry: "Buy POC/VAL retest with acceptance"
+          stop: "Below VAL − 0.5×ATR(5m) or swing low"
+          targets: ["TP1 at upper HVN", "TP2 at VAH/PDH cluster"]
+          management: ["Trail under rising LVNs or developing POC"]
+      short_setups:
+        - name: "Countertrend at VAH Only (Strong Rejection)"
+          triggers:
+            - "Rejection at VAH/gap AND POC slope turns down"
+          entry: "Small tactical probe"
+          stop: "Above VAH + buffer"
+          targets: ["TP1 at POC"]
+          management: ["Reduce quick if POC resumes up migration"]
+      notes:
+        - "Do not fight rising POC without clear rejection + slope flip."
+    invalidation_day:
+      - "POC slope flips down and acceptance below POC persists"
+      - "Gap-Closure Warning against longs with acceptance below POC"
+    invalidation_trade:
+      - "Acceptance below POC after entry"
+      - "Failure to hold reclaim for >= 60m"
+    lvn_hvn_usage:
+      hvn: "Targets/magnets above."
+      lvn: "Pullback lines below; invalidation if filled and accepted."
+
+  b:
+    label: "b (Bottom-Heavy)"
+    description: "Lower distribution; long-liquidation/trend-down tone."
+    evidence_required:
+      - "poc_pos_0to1 <= poc_pos_bottom"
+      - "ib_ext.dn >= ib_ext_trend_min"
+      - "va_ratio <= va_ratio_balanced_max"
+      - "poc_slope_15m.direction == lower"
+    trade_plan:
+      short_setups:
+        - name: "Pullback to POC/VAH with Hold"
+          triggers:
+            - "Acceptance at/below POC after pullback"
+            - "POC migrating down on 15m checkpoints"
+          entry: "Sell POC/VAH retest with acceptance"
+          stop: "Above VAH + 0.5×ATR(5m) or swing high"
+          targets: ["TP1 at lower LVN", "TP2 at VAL/PDL cluster"]
+          management: ["Trail above falling LVNs or developing POC"]
+      long_setups:
+        - name: "Countertrend at VAL Only (Strong Rejection)"
+          triggers:
+            - "Rejection at VAL AND POC slope turns up"
+          entry: "Small tactical probe"
+          stop: "Below VAL − buffer"
+          targets: ["TP1 at POC"]
+          management: ["Reduce quick if POC resumes down migration"]
+      notes:
+        - "Do not fight falling POC without clear rejection + slope flip."
+    invalidation_day:
+      - "POC slope flips up and acceptance above POC persists"
+      - "Gap-Closure Warning against shorts with acceptance above POC"
+    invalidation_trade:
+      - "Acceptance above POC after entry"
+      - "Failure to hold reclaim for >= 60m"
+    lvn_hvn_usage:
+      hvn: "Targets/magnets below."
+      lvn: "Pullback lines above; invalidation if filled and accepted."
+
+  B:
+    label: "B (Double Distribution)"
+    description: "Two distributions separated by LVN/single prints; hinge behavior."
+    evidence_required:
+      - "bimodality.is_bimodal == true"
+      - "HVNs separated by >= 20% of range with deep LVN between"
+    trade_plan:
+      continuation:
+        - name: "Retest of Single Prints (Separation Zone)"
+          triggers:
+            - "Probe into LVN/prints fails (rejection)"
+          entry: "Enter in direction of dominant distribution after rejection"
+          stop: "Beyond LVN/print + buffer"
+          targets: ["TP1 next HVN in direction", "TP2 VA edge in direction"]
+      rotation:
+        - name: "Acceptance Flip Across LVN"
+          triggers:
+            - "Acceptance through LVN into opposite distribution (2 closes + 15m checkpoint)"
+          entry: "Enter with new distribution bias"
+          stop: "Back inside LVN + buffer"
+          targets: ["TP1 POC of new distribution", "TP2 VA edge of new distribution"]
+      notes:
+        - "The LVN between distributions is the on/off switch; trade rejections/acceptance transitions."
+    invalidation_day:
+      - "Loss of bimodality (distributions merge; LVN fills with acceptance)"
+    invalidation_trade:
+      - "Acceptance across your LVN switch against position"
+    lvn_hvn_usage:
+      hvn: "Targets/magnets inside each distribution."
+      lvn: "Separation hinge; trade rejections/acceptance transitions."
+
+overlays:
+  Trend:
+    evidence_required:
+      - "ib_ext.up >= ib_ext_trend_min or ib_ext.dn >= ib_ext_trend_min"
+      - "poc_slope_15m.direction in [higher, lower]"
+    trade_plan:
+      - "With-trend pullbacks to POC/VAL (up) or POC/VAH (down)"
+      - "Breakout + retest beyond IB with acceptance"
+    invalidation:
+      - "Acceptance back inside IB with POC slope flattening"
+
+  Neutral:
+    evidence_required:
+      - "Both IB edges not violated; center behavior"
+    trade_plan:
+      - "Favor fades at VA edges; scale at POC"
+    invalidation:
+      - "Sustained acceptance beyond VA with slope turn"
+
+  Neutral_Extreme:
+    evidence_required:
+      - "Both IB edges taken but close at/near one extreme with acceptance"
+    trade_plan:
+      - "Late-day continuation toward extreme; use LVNs to trail"
+    invalidation:
+      - "Loss of acceptance at extreme; revert to Neutral"
+
+checklists:
+  pre_trade:
+    - "Bias aligns with POC slope and gap context?"
+    - "Entry at a level (VAL/POC/VAH/HVN/LVN), not mid-profile?"
+    - "Time-of-day supportive (post gate / news cleared)?"
+    - "Invalidation explicit (other side of edge ± 0.5×ATR)?"
+  during_trade:
+    - "Acceptance still in your favor (closes + 15m checkpoint)?"
+    - "POC migration consistent with position?"
+    - "Approaching HVN/LVN magnet — scale/adjust?"
+  post_trade:
+    - "Did evidence match the plan?"
+    - "Were invalidation rules honored quickly?"
+    - "Lesson logged for next similar structure?"
