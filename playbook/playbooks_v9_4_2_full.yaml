@@ -1,0 +1,381 @@
+
+# === Embedded Unified Playbook Library (v9.4.2) ===
+# Coverage: Openings, IB/RE, Gaps (Gap & Go/Fade, RTH Gap Close), Spikes,
+# Shapes (P, b, D), Morphs (P->B, b->B, D->P, D->b, Normal->Trend, Neutral->Extreme, Trend->DD),
+# Extreme tests (LAB/LBF), Prominent POC magnet, dPOC relocations, HVN/LVN tests.
+
+opening_playbooks:
+  - id: OD_with_trend
+    label: Open-Drive with higher-timeframe trend
+    applicable_when:
+      opening_type: "Open-Drive"
+    triggers:
+      - "Drive away from open with limited counter-test"
+      - "Early one-timeframing in drive direction"
+    entry: "Go-with on first pullback holding above/below open or spike base"
+    exits: ["Distribution node in direction", "VA edge; scale on elongation stall"]
+    invalidation: ["Return through open with acceptance", "Break in one-timeframing"]
+    notes: "Highest conviction open; do not fight while intact."
+
+  - id: OTD_continuation
+    label: Open-Test-Drive continuation
+    applicable_when:
+      opening_type: "Open-Test-Drive"
+    triggers:
+      - "Opposite test rejects, then drive resumes"
+    entry: "Reclaim of open or IB edge with acceptance (15m provisional -> 30m confirm)"
+    exits: ["IB projection", "Next node"]
+    invalidation: ["Loss of acceptance back through open", "Failure to extend"]
+    notes: "High conviction but a step below OD."
+
+  - id: ORR_reversal
+    label: Open-Rejection-Reverse reversal
+    applicable_when:
+      opening_type: "Open-Rejection-Reverse"
+    triggers:
+      - "Single-print tail at early extreme then cross back through open"
+    entry: "Go-with after one-timeframing begins in new direction"
+    exits: ["Prior value edge", "Opposite extreme"]
+    invalidation: ["Failure to one-timeframe"]
+    notes: "Confidence lower than OD/OTD; rotations likely later."
+
+  - id: OA_balance
+    label: Open-Auction balance
+    applicable_when:
+      opening_type: "Open-Auction"
+      open_location_any_of: ["Inside Value","Within Prior Value"]
+    triggers:
+      - "Two-sided rotation around open; limited extension"
+    entry: "Fade extremes toward POC/VA center"
+    exits: ["POC","Opposite VA edge"]
+    invalidation: ["Acceptance outside prior value or IB with elongation"]
+    notes: "Lower conviction; patience and mean reversion."
+
+gap_playbooks:
+  - id: gap_and_go_up
+    label: Gap & Go Up
+    applicable_when:
+      gap_type: "Outside_Prior_Range"
+      opening_type_any_of: ["Open-Drive","Open-Test-Drive"]
+      on_inventory_any_of: ["Too_Short","Balanced"]
+    triggers:
+      - "Hold above prior range/value (acceptance)"
+      - "RE Up within first 1-2 hours"
+    entry: "First pullback that holds at spike base/open-test low/IB High"
+    exits: ["IB measured move","Developing value highs"]
+    invalidation: ["15m close back inside prior range (provisional fail)",
+                   "30m close inside prior range (confirmed fail)"]
+    notes: "Classic continuation; reduce size if prominent POC forms above."
+
+  - id: gap_and_go_down
+    label: Gap & Go Down
+    applicable_when:
+      gap_type: "Outside_Prior_Range"
+      opening_type_any_of: ["Open-Drive","Open-Test-Drive"]
+      on_inventory_any_of: ["Too_Long","Balanced"]
+    triggers:
+      - "Hold below prior range/value (acceptance)"
+      - "RE Down within first 1-2 hours"
+    entry: "First bounce that holds at spike base/open-test high/IB Low"
+    exits: ["IB measured move","Developing value lows"]
+    invalidation: ["15m close back inside prior range (provisional fail)",
+                   "30m close inside prior range (confirmed fail)"]
+    notes: "Mirror of gap & go up."
+
+  - id: gap_fade_down_from_gap_up
+    label: Gap Fade Down from Gap Up
+    applicable_when:
+      gap_type_any_of: ["Outside_Prior_Range","Into_Prior_Range"]
+      opening_type_any_of: ["Open-Auction","Open-Rejection-Reverse"]
+      on_inventory: "Too_Long"
+    triggers:
+      - "Failure to extend higher"
+      - "15m close back inside prior range"
+    entry: "Short back inside prior range after failed retest"
+    exits: ["Prior POC/VA center","Opposite extreme if acceptance builds"]
+    invalidation: ["Re-escape and 15m hold back outside","30m confirm"]
+    notes: "Inventory correction and return to value."
+
+  - id: gap_fade_up_from_gap_down
+    label: Gap Fade Up from Gap Down
+    applicable_when:
+      gap_type_any_of: ["Outside_Prior_Range","Into_Prior_Range"]
+      opening_type_any_of: ["Open-Auction","Open-Rejection-Reverse"]
+      on_inventory: "Too_Short"
+    triggers:
+      - "Failure to extend lower"
+      - "15m close back inside prior range"
+    entry: "Long back inside prior range after failed retest"
+    exits: ["Prior POC/VA center","Opposite extreme if acceptance builds"]
+    invalidation: ["Re-escape and 15m hold back outside","30m confirm"]
+    notes: "Inventory correction and return to value."
+
+rth_gap_close_playbooks:
+  - id: rth_gap_close_up_fade
+    label: RTH Gap Close - Fade Down (from Gap Up)
+    applicable_when:
+      rth_gap_dir: "Up"
+      day_type_any_of: ["D","Neutral","Balance","Normal","Normal-Variation"]
+    triggers:
+      - "Progress toward prior close; failure to extend higher"
+    entry: "Short toward prior close once acceptance back inside is seen"
+    exits: ["At/near prior close","POC/VA center if momentum continues"]
+    invalidation: ["Re-escape above prior range with acceptance","Peer gap close against bias = caution"]
+    notes: "Common D-day behavior; watch peers for timing."
+
+  - id: rth_gap_close_down_fade
+    label: RTH Gap Close - Fade Up (from Gap Down)
+    applicable_when:
+      rth_gap_dir: "Down"
+      day_type_any_of: ["D","Neutral","Balance","Normal","Normal-Variation"]
+    triggers:
+      - "Progress toward prior close; failure to extend lower"
+    entry: "Long toward prior close once acceptance back inside is seen"
+    exits: ["At/near prior close","POC/VA center if momentum continues"]
+    invalidation: ["Re-escape below prior range with acceptance","Peer gap close against bias = caution"]
+    notes: "Common D-day behavior; watch peers for timing."
+
+ib_re_playbooks:
+  - id: ib_breakout_success
+    label: IB Breakout Success
+    applicable_when:
+      re_status_any_of: ["Provisional","Confirmed"]
+    triggers:
+      - "RE beyond IB with time acceptance and elongation"
+    entry: "Go-with on pullback to IB edge that holds with 15m acceptance"
+    exits: ["Next distribution node","IB projection"]
+    invalidation: ["30m close back inside IB"]
+    notes: "Attempted direction validated; do not fade until one-timeframing breaks."
+
+  - id: ib_breakout_failure_balance
+    label: IB Breakout Failure -> Balance
+    applicable_when:
+      re_status: "Failure"
+    triggers:
+      - "Probes beyond IB return quickly inside"
+    entry: "Fade IB extremes toward POC"
+    exits: ["POC","Opposite IB edge"]
+    invalidation: ["Subsequent RE with acceptance"]
+    notes: "Rotational day expectations."
+
+spike_playbooks:
+  - id: spike_next_day_up
+    label: Next Day After Late Spike Up
+    applicable_when:
+      spike_present: true
+    triggers:
+      - "Open and hold above Spike Base (acceptance)"
+    entry: "Go-with on pullback to Spike Base that holds"
+    exits: ["Prior spike high","Measured extensions"]
+    invalidation: ["Acceptance back below Spike Base"]
+    notes: "If open below base, bias flips to rejection/fade."
+
+shape_playbooks:
+  - id: shape_P
+    label: P-day Short Covering
+    applicable_when:
+      shape: "P"
+    triggers:
+      - "Skew up, thin lower tail, upper fatness"
+    entry: "Buy pullbacks only with fresh acceptance above POC or IB High"
+    exits: ["Next upper node","Scale at POC/VA if no new value develops"]
+    invalidation: ["30m close back below POC with dPOC rolling down"]
+    notes: "Limited timeframe; avoid chasing vertical moves."
+
+  - id: shape_b
+    label: b-day Long Liquidation
+    applicable_when:
+      shape: "b"
+    triggers:
+      - "Skew down, thin upper tail, lower fatness"
+    entry: "Sell bounces only with acceptance lower"
+    exits: ["Next lower node","Scale at POC/VA if no new value develops"]
+    invalidation: ["30m close back above POC with dPOC lifting"]
+    notes: "Limited timeframe; avoid chasing vertical moves."
+
+  - id: shape_D
+    label: D-day Balance
+    applicable_when:
+      shape_any_of: ["D","Balance"]
+    triggers:
+      - "High center fatness; stable dPOC; limited RE"
+    entry: "Fade extremes toward POC/VA center; LAB/LBF at edges"
+    exits: ["POC","Opposite balance edge"]
+    invalidation: ["Acceptance outside balance (15m provisional -> 30m confirmed)"]
+    notes: "Mean-revert conditions; take profits at POC/edges."
+
+morph_playbooks:
+  - id: morph_P_to_B
+    label: P to Balance (P->B)
+    applicable_when:
+      morph_event: "P_to_B"
+    triggers:
+      - "Profile fattens at center; dPOC stabilizes"
+    entry: "Switch to fade extremes; avoid chasing"
+    exits: ["POC","Opposite edge"]
+    invalidation: ["New acceptance forms above prior upper distribution"]
+    notes: "Transition out of short-covering."
+
+  - id: morph_b_to_B
+    label: b to Balance (b->B)
+    applicable_when:
+      morph_event: "b_to_B"
+    triggers:
+      - "Center fattens; dPOC stabilizes"
+    entry: "Switch to fade extremes"
+    exits: ["POC","Opposite edge"]
+    invalidation: ["New acceptance forms below prior lower distribution"]
+    notes: "Transition out of long-liquidation."
+
+  - id: morph_D_to_P
+    label: D to P (late breakout up)
+    applicable_when:
+      morph_event: "D_to_P"
+    triggers:
+      - "Tight D box; early 15m acceptance above; RE up"
+    entry: "Go-with breakout; buy pullbacks to box top"
+    exits: ["IB projection","Next node"]
+    invalidation: ["Return and acceptance back inside box"]
+    notes: "Avoid fading until one-timeframing breaks."
+
+  - id: morph_D_to_b
+    label: D to b (late breakdown)
+    applicable_when:
+      morph_event: "D_to_b"
+    triggers:
+      - "Tight D box; early 15m acceptance below; RE down"
+    entry: "Go-with breakdown; sell bounces to box bottom"
+    exits: ["Next lower node"]
+    invalidation: ["Return and acceptance back inside box"]
+    notes: "Avoid fading until one-timeframing breaks."
+
+  - id: morph_Normal_to_Trend
+    label: Normal -> Trend morph
+    applicable_when:
+      day_type_prev: "Normal"
+      day_type_now_any_of: ["Trend Up","Trend Down"]
+    triggers:
+      - "Later-session elongation with acceptance"
+    entry: "Go-with on pullback; use one-timeframing as guardrail"
+    exits: ["Next nodes in direction"]
+    invalidation: ["Break of one-timeframing or return to IB"]
+    notes: "Rare but important when it happens."
+
+  - id: morph_Neutral_to_Extreme
+    label: Neutral -> Neutral-Extreme morph
+    applicable_when:
+      day_type_prev: "Neutral"
+      day_type_now: "Neutral-Extreme"
+    triggers:
+      - "Late initiative takes control into close"
+    entry: "Go-with; bias carries to next session unless rejected"
+    exits: ["End-of-day target or spike rules"]
+    invalidation: ["Loss of acceptance at extreme"]
+    notes: "Expect carry-over if spike accepted."
+
+  - id: morph_Trend_to_DD
+    label: Trend -> Double-Distribution morph
+    applicable_when:
+      day_type_prev_any_of: ["Trend Up","Trend Down"]
+      day_type_now: "Double-Distribution"
+    triggers:
+      - "Midday pause builds second distribution"
+    entry: "Rejoin on break from midday balance (second auction)"
+    exits: ["Measured move from second distribution"]
+    invalidation: ["Failure back into midday balance"]
+    notes: "Classic DD development."
+
+extreme_tests:
+  - id: look_above_fail
+    label: Look Above and Fail (balance edge)
+    applicable_when:
+      context: "balance_extreme_probe"
+    triggers:
+      - "Probe above balance extreme fails; quick return inside"
+    entry: "Short back inside; traverse toward opposite extreme"
+    exits: ["Opposite balance extreme"]
+    invalidation: ["Acceptance above the extreme"]
+    notes: "Mean-reversion traversal."
+
+  - id: look_below_fail
+    label: Look Below and Fail (balance edge)
+    applicable_when:
+      context: "balance_extreme_probe"
+    triggers:
+      - "Probe below balance extreme fails; quick return inside"
+    entry: "Long back inside; traverse toward opposite extreme"
+    exits: ["Opposite balance extreme"]
+    invalidation: ["Acceptance below the extreme"]
+    notes: "Mean-reversion traversal."
+
+hvn_lvn_playbooks:
+  - id: lvn_reject_to_hvn
+    label: LVN Rejection -> Rotate to HVN
+    applicable_when:
+      lvn_tested: true
+      rejection_seen: true
+    triggers:
+      - "Price taps LVN and rejects (wick/return inside)"
+    entry: "Enter toward nearest HVN in rotation direction"
+    exits: ["Nearest HVN","POC if closer"]
+    invalidation: ["Acceptance builds through LVN (15m provisional -> 30m confirmed)"]
+    notes: "Auctions avoid thin spots and re-balance at fat nodes."
+
+  - id: lvn_break_accept
+    label: LVN Break and Accept -> Traverse to Next Node
+    applicable_when:
+      lvn_broken: true
+      acceptance_beyond_lvn: true
+    triggers:
+      - "Sustained trade beyond LVN; low resistance path"
+    entry: "Go-with toward next HVN/node"
+    exits: ["Next HVN/node boundary"]
+    invalidation: ["Return back inside and loss of acceptance"]
+    notes: "Once through thin areas, price can travel quickly."
+
+  - id: hvn_reject_back_to_balance
+    label: HVN Rejection -> Back to Balance
+    applicable_when:
+      hvn_tested: true
+      rejection_seen: true
+    triggers:
+      - "Test into HVN fails to find continuation"
+    entry: "Fade back toward POC/balance center"
+    exits: ["POC","Opposite edge"]
+    invalidation: ["Acceptance persists inside HVN with elongation"]
+    notes: "HVNs can act like 'bear traps' for late chasers."
+
+risk_cautions:
+  - id: prominent_poc_magnet
+    label: Prominent POC Magnet
+    applicable_when:
+      prominent_poc: true
+    triggers:
+      - "Wide TPO row at POC; rotation behavior"
+    entry: "Reduce size when trading away from POC; consider mean reversion"
+    exits: ["POC as magnet"]
+    invalidation: ["Elongation away from POC with acceptance"]
+    notes: "POC often pulls price back."
+
+dpoc_relocation_playbooks:
+  - id: dpoc_relocation_up
+    label: dPOC Relocation Up
+    applicable_when:
+      dpoc_jump: "Up"
+    triggers:
+      - "POC jumps higher; acceptance at new level"
+    entry: "Buy pullbacks to new POC"
+    exits: ["Next upper node"]
+    invalidation: ["Acceptance back at old POC"]
+    notes: "Structural change; align to new center."
+
+  - id: dpoc_relocation_down
+    label: dPOC Relocation Down
+    applicable_when:
+      dpoc_jump: "Down"
+    triggers:
+      - "POC jumps lower; acceptance at new level"
+    entry: "Sell bounces to new POC"
+    exits: ["Next lower node"]
+    invalidation: ["Acceptance back at old POC"]
+    notes: "Structural change; align to new center."
