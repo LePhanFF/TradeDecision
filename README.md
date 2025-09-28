@@ -11,7 +11,7 @@ This repo is the **source of truth** for prompt specifications, playbook docs, c
 ### 1. Prompts
 - **TPO Analysis**
   Auction Market Theory + TPO/Volume Profile analysis prompts.
-  Versions: `v9.0`, `v9.1`
+  Versions: `v9.1.6`, `v9.2`, `v9.2c`, `v9.2.1`, `v9.2.2`, `v9.2.3`
 
 - **ICT Analysis**
   ICT-style liquidity setup analysis.
