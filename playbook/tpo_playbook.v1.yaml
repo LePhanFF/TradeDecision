@@ -1,224 +1,124 @@
-meta:
-  name: TPO Core Playbook
-  version: 1
-  updated: 2025-09-27
-  description: >-
-    Actionable playbook for Dalton-style TPO day types with auction-theory evidence,
-    trading plans, and invalidation rules. Designed for V9.2.1 engine.
+# tpo_playbook.v1.yaml
+schema: tpo_playbook.v1
+version: 1
 
-defaults:
-  tick_size:
-    ES: 0.25
-    NQ: 0.25
-    YM: 1.0
-  acceptance_rule:
-    bars_required: 2
-    timeframe: "5m"
-    confirm_checkpoint_15m: true
-  auction_acceptance_hold_rule:
-    hold_minutes: 60
-    also_hold_into: "13:00"
-  risk:
-    base_risk_usd: 400
-    stop_buffer_atr: 0.5
-    tp1_R_multiple: 2
-    time_gate:
-      enable: true
-      not_before: "10:30"
+# Key = "day_type,ib_side,ib_acceptance,gap_closed,dominant_evidence"
+# day_type: D|P|b|B
+# ib_side: Up|Down|None
+# ib_acceptance: true|false           # our v9.2x acceptance test (>=0.25xIB & holds)
+# gap_closed: true|false              # first touch of prior RTH close by cutoff
+# dominant_evidence: E_* tag from v9.2c (e.g., E_DPOC_RUN_DOWN)
 
-thresholds:
-  poc_pos_top: 0.66
-  poc_pos_bottom: 0.34
-  va_ratio_balanced_max: 0.55
-  ib_ext_trend_min: 0.25
-  bimodality_hvn_gap_frac: 0.20
-  lvn_depth_max_of_small_hvn: 0.30
+plays:
 
-day_types:
-  D:
-    label: "D (Balance)"
-    description: >-
-      Balanced auction; expect rotations VAL↔POC↔VAH. POC often magnet.
-    evidence_required:
-      - "va_ratio <= va_ratio_balanced_max"
-      - "ib_ext.up < ib_ext_trend_min and ib_ext.dn < ib_ext_trend_min"
-      - "poc_slope_15m.direction == flat"
-      - "bimodality.is_bimodal == false"
-    trade_plan:
-      long_setups:
-        - name: "VAL Acceptance Long"
-          triggers:
-            - "Acceptance above VAL (2 closes; 15m checkpoint agrees)"
-          entry: "Retest VAL with confirmation"
-          stop: "Below VAL − 0.5×ATR(5m) or swing low"
-          targets: ["TP1 at POC", "TP2 toward VAH or nearest HVN above"]
-          management: ["Reduce if stall at POC; re-add on acceptance above POC"]
-      short_setups:
-        - name: "VAH Rejection Short"
-          triggers:
-            - "Rejection at VAH (probe fails; no acceptance)"
-          entry: "Retest VAH rejection wick"
-          stop: "Above VAH + 0.5×ATR(5m) or swing high"
-          targets: ["TP1 at POC", "TP2 toward VAL or nearest HVN below"]
-          management: ["If acceptance above POC occurs, reduce risk"]
-      notes:
-        - "Avoid mid-profile initiations; trade edges or post-BOS + acceptance."
-        - "Respect 10:30 gate for counter-trend fades."
-    invalidation_day:
-      - "POC migrates strongly (directional) + IB extension crosses trend min with acceptance"
-      - "Gap-Closure Warning against initial read + POC slope disagreement"
-    invalidation_trade:
-      - "Acceptance beyond your edge (VAL/VAH) against position"
-      - "Opposite LVN fills and holds (no rejection)"
-    lvn_hvn_usage:
-      hvn: "Magnets/scale; stalls/rotations common at HVNs."
-      lvn: "Rejection lines and trail references; acceleration risk through LVNs."
+  # ========= BALANCED DAY TILTING DOWN (common) =========
+  "D,Down,false,true,E_DPOC_RUN_DOWN":
+    name: "Balanced → downside tilt (gap closed)"
+    checklist:
+      - "Bias short into **LVN below**; use **POC** as risk reference"
+      - "Favor entries on **IB mid/IBL retests** or weak bounces"
+      - "Avoid chasing if price returns **inside VA** quickly"
+    targets: ["Nearest LVN below", "VAL − 0.3×IB", "Prior session HVN"]
+    invalidations: ["Close back **inside IB**", "POC shifts up to **middle third**", "DPOC returns to VA next bracket"]
+    management: ["Trail above prior bracket **high**", "Reduce risk after LVN reaction"]
+    confidence: med
+    notes: "DPOC run ≈ value migration down; gap closed removes mean-reversion pressure."
 
-  P:
-    label: "P (Top-Heavy)"
-    description: "Upper distribution; trend-up/short-covering tone."
-    evidence_required:
-      - "poc_pos_0to1 >= poc_pos_top"
-      - "ib_ext.up >= ib_ext_trend_min"
-      - "va_ratio <= va_ratio_balanced_max"
-      - "poc_slope_15m.direction == higher"
-    trade_plan:
-      long_setups:
-        - name: "Pullback to POC/VAL with Hold"
-          triggers:
-            - "Acceptance at/above POC after pullback"
-            - "POC migrating up on 15m checkpoints"
-          entry: "Buy POC/VAL retest with acceptance"
-          stop: "Below VAL − 0.5×ATR(5m) or swing low"
-          targets: ["TP1 at upper HVN", "TP2 at VAH/PDH cluster"]
-          management: ["Trail under rising LVNs or developing POC"]
-      short_setups:
-        - name: "Countertrend at VAH Only (Strong Rejection)"
-          triggers:
-            - "Rejection at VAH/gap AND POC slope turns down"
-          entry: "Small tactical probe"
-          stop: "Above VAH + buffer"
-          targets: ["TP1 at POC"]
-          management: ["Reduce quick if POC resumes up migration"]
-      notes:
-        - "Do not fight rising POC without clear rejection + slope flip."
-    invalidation_day:
-      - "POC slope flips down and acceptance below POC persists"
-      - "Gap-Closure Warning against longs with acceptance below POC"
-    invalidation_trade:
-      - "Acceptance below POC after entry"
-      - "Failure to hold reclaim for >= 60m"
-    lvn_hvn_usage:
-      hvn: "Targets/magnets above."
-      lvn: "Pullback lines below; invalidation if filled and accepted."
+  "D,Down,false,false,E_DPOC_RUN_DOWN":
+    name: "Balanced → downside tilt (gap open)"
+    checklist:
+      - "Favor shorts toward **gap-fill** & lower LVNs"
+      - "If gap refuses to close on first attempt, keep a runner"
+    targets: ["Gap-fill price", "LVN below", "VAL − 0.5×IB"]
+    invalidations: ["Strong **IB re-entry** & close above IBL", "DPOC back inside VA"]
+    management: ["Trail above prior bracket high", "Trim into gap-fill reaction"]
+    confidence: med
+    notes: "Open gap can serve as magnet but can also sustain trend if not filling quickly."
 
-  b:
-    label: "b (Bottom-Heavy)"
-    description: "Lower distribution; long-liquidation/trend-down tone."
-    evidence_required:
-      - "poc_pos_0to1 <= poc_pos_bottom"
-      - "ib_ext.dn >= ib_ext_trend_min"
-      - "va_ratio <= va_ratio_balanced_max"
-      - "poc_slope_15m.direction == lower"
-    trade_plan:
-      short_setups:
-        - name: "Pullback to POC/VAH with Hold"
-          triggers:
-            - "Acceptance at/below POC after pullback"
-            - "POC migrating down on 15m checkpoints"
-          entry: "Sell POC/VAH retest with acceptance"
-          stop: "Above VAH + 0.5×ATR(5m) or swing high"
-          targets: ["TP1 at lower LVN", "TP2 at VAL/PDL cluster"]
-          management: ["Trail above falling LVNs or developing POC"]
-      long_setups:
-        - name: "Countertrend at VAL Only (Strong Rejection)"
-          triggers:
-            - "Rejection at VAL AND POC slope turns up"
-          entry: "Small tactical probe"
-          stop: "Below VAL − buffer"
-          targets: ["TP1 at POC"]
-          management: ["Reduce quick if POC resumes down migration"]
-      notes:
-        - "Do not fight falling POC without clear rejection + slope flip."
-    invalidation_day:
-      - "POC slope flips up and acceptance above POC persists"
-      - "Gap-Closure Warning against shorts with acceptance above POC"
-    invalidation_trade:
-      - "Acceptance above POC after entry"
-      - "Failure to hold reclaim for >= 60m"
-    lvn_hvn_usage:
-      hvn: "Targets/magnets below."
-      lvn: "Pullback lines above; invalidation if filled and accepted."
+  # ========= BALANCED DAY TILTING UP =========
+  "D,Up,false,true,E_DPOC_RUN_UP":
+    name: "Balanced → upside tilt (gap closed)"
+    checklist:
+      - "Bias long on **IBH/POC retests** or shallow dips into LVN"
+    targets: ["Nearest LVN above", "VAH + 0.3×IB"]
+    invalidations: ["Close back **inside IB**", "POC shifts down to middle third"]
+    management: ["Trail below prior bracket **low**"]
+    confidence: med
+    notes: "DPOC run up signals building value higher; gap closed removes fade pressure."
 
-  B:
-    label: "B (Double Distribution)"
-    description: "Two distributions separated by LVN/single prints; hinge behavior."
-    evidence_required:
-      - "bimodality.is_bimodal == true"
-      - "HVNs separated by >= 20% of range with deep LVN between"
-    trade_plan:
-      continuation:
-        - name: "Retest of Single Prints (Separation Zone)"
-          triggers:
-            - "Probe into LVN/prints fails (rejection)"
-          entry: "Enter in direction of dominant distribution after rejection"
-          stop: "Beyond LVN/print + buffer"
-          targets: ["TP1 next HVN in direction", "TP2 VA edge in direction"]
-      rotation:
-        - name: "Acceptance Flip Across LVN"
-          triggers:
-            - "Acceptance through LVN into opposite distribution (2 closes + 15m checkpoint)"
-          entry: "Enter with new distribution bias"
-          stop: "Back inside LVN + buffer"
-          targets: ["TP1 POC of new distribution", "TP2 VA edge of new distribution"]
-      notes:
-        - "The LVN between distributions is the on/off switch; trade rejections/acceptance transitions."
-    invalidation_day:
-      - "Loss of bimodality (distributions merge; LVN fills with acceptance)"
-    invalidation_trade:
-      - "Acceptance across your LVN switch against position"
-    lvn_hvn_usage:
-      hvn: "Targets/magnets inside each distribution."
-      lvn: "Separation hinge; trade rejections/acceptance transitions."
+  "D,Up,false,false,E_DPOC_RUN_UP":
+    name: "Balanced → upside tilt (gap open)"
+    checklist:
+      - "Favor longs **toward gap-fill** then VAH"
+    targets: ["Gap-fill price", "VAH + 0.5×IB"]
+    invalidations: ["IB re-entry and close under IBH", "DPOC snaps back inside VA"]
+    management: ["Trail below prior bracket low"]
+    confidence: med
+    notes: "Open up-gap may either fill or persist; trade with structure."
 
-overlays:
-  Trend:
-    evidence_required:
-      - "ib_ext.up >= ib_ext_trend_min or ib_ext.dn >= ib_ext_trend_min"
-      - "poc_slope_15m.direction in [higher, lower]"
-    trade_plan:
-      - "With-trend pullbacks to POC/VAL (up) or POC/VAH (down)"
-      - "Breakout + retest beyond IB with acceptance"
-    invalidation:
-      - "Acceptance back inside IB with POC slope flattening"
+  # ========= ACCEPTED IB BREAK (trend/initiative) =========
+  "D,Up,true,*,E_DPOC_OUTSIDE_IB_UP":
+    name: "Accepted above IB (initiative up)"
+    checklist:
+      - "Buy **pullbacks above IBH** (acceptance zone)"
+      - "If single prints form below, place invalidation beneath them"
+    targets: ["VAH extension", "Prior session HVN above"]
+    invalidations: ["Close back **inside IB**", "One-timeframing **Down** starts"]
+    management: ["Trail below last single-print base or prior bracket low"]
+    confidence: high
+    notes: "Per IB play: extension that **holds** outside IB indicates acceptance, not probe."
 
-  Neutral:
-    evidence_required:
-      - "Both IB edges not violated; center behavior"
-    trade_plan:
-      - "Favor fades at VA edges; scale at POC"
-    invalidation:
-      - "Sustained acceptance beyond VA with slope turn"
+  "D,Down,true,*,E_DPOC_OUTSIDE_IB_DOWN":
+    name: "Accepted below IB (initiative down)"
+    checklist:
+      - "Sell **bounces below IBL**; respect acceptance zone"
+      - "Use single-print caps above for invalidation"
+    targets: ["VAL extension", "Prior session HVN below"]
+    invalidations: ["Close back **inside IB**", "One-timeframing **Up** starts"]
+    management: ["Trail above last single-print cap or prior bracket high"]
+    confidence: high
+    notes: "Acceptance below IBL → price is being **accepted** lower."
 
-  Neutral_Extreme:
-    evidence_required:
-      - "Both IB edges taken but close at/near one extreme with acceptance"
-    trade_plan:
-      - "Late-day continuation toward extreme; use LVNs to trail"
-    invalidation:
-      - "Loss of acceptance at extreme; revert to Neutral"
+  # ========= REJECTION AFTER PUSH =========
+  "*,*,*,*,E_DPOC_RETURN_TO_VA":
+    name: "Rejection—back inside value"
+    checklist:
+      - "Fade pushes back toward **POC** / opposite VA edge"
+      - "Take profits at **POC/HVN**; expect balance"
+    targets: ["POC", "Opposite VA edge"]
+    invalidations: ["DPOC resumes run outside VA", "Fresh single prints against the fade"]
+    management: ["Flat into POC reaction if rotation weakens"]
+    confidence: low
+    notes: "Outside push failed to hold; revert to balance expectations."
 
-checklists:
-  pre_trade:
-    - "Bias aligns with POC slope and gap context?"
-    - "Entry at a level (VAL/POC/VAH/HVN/LVN), not mid-profile?"
-    - "Time-of-day supportive (post gate / news cleared)?"
-    - "Invalidation explicit (other side of edge ± 0.5×ATR)?"
-  during_trade:
-    - "Acceptance still in your favor (closes + 15m checkpoint)?"
-    - "POC migration consistent with position?"
-    - "Approaching HVN/LVN magnet — scale/adjust?"
-  post_trade:
-    - "Did evidence match the plan?"
-    - "Were invalidation rules honored quickly?"
-    - "Lesson logged for next similar structure?"
+  # ========= DOUBLE-DISTRIBUTION RISK =========
+  "B,*,false,*,E_DOUBLE_DISTRIBUTION_RISK":
+    name: "Developing double-distribution (B-type risk)"
+    checklist:
+      - "Trade **between distributions**: fade into LVN, target opposing HVN"
+      - "If DPOC shifts to upper node, switch bias to that node"
+    targets: ["Upper/Lower **HVN**", "LVN midpoint"]
+    invalidations: ["Acceptance inside the **split LVN** (no longer rejection)", "POC consolidates in middle third"]
+    management: ["Reduce size in middle; add only at node edges"]
+    confidence: med
+    notes: "Two nodes forming; LVN acts as divider. Expect rotations."
+
+  # ========= CLASSIC P/b DAYS (excess tail + value skew) =========
+  "P,*,*,*,E_STABLE_DPOC_IN_VALUE":
+    name: "P-day bias (excess low, distribution higher)"
+    checklist:
+      - "Lean long on **VAL retests**; avoid chasing into VAH"
+    targets: ["POC", "VAH"]
+    invalidations: ["POC shifts down to middle third", "Strong IB re-entry down"]
+    management: ["Trail below VAL"]
+    confidence: med
+
+  "b,*,*,*,E_STABLE_DPOC_IN_VALUE":
+    name: "b-day bias (excess high, distribution lower)"
+    checklist:
+      - "Lean short on **VAH retests**; avoid chasing into VAL"
+    targets: ["POC", "VAL"]
+    invalidations: ["POC shifts up to middle third", "Strong IB re-entry up"]
+    management: ["Trail above VAH"]
+    confidence: med
+
