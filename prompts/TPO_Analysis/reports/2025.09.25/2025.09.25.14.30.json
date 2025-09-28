@@ -1,0 +1,111 @@
+{
+  "session_date": "2025-09-25",
+  "cutoff_time_et": "14:30",
+  "indices": {
+    "NQ": {
+      "role": "primary",
+      "gap": {
+        "direction": "Down",
+        "size": -159.25,
+        "prior_close": 24739.50
+      },
+      "ib": {
+        "high": 24641.75,
+        "low": 24422.50,
+        "size": 219.25,
+        "first_re": {"direction": "Up", "time": "10:45"},
+        "acceptance": {
+          "provisional": true,
+          "confirmed": true,
+          "details": "2×15m closes above IBH by ~11:45 ET and one 30m hold"
+        }
+      },
+      "last_price": 24581.50,
+      "value_area": {"val": 24484.75, "poc": 24616.75, "vah": 24687.00},
+      "otf": "None",
+      "dpoc": {"status": "Stable", "comment": "pm balance"},
+      "nodes": {"lvns_near": ["just above VAH"], "hvns_near": ["around/under POC"]},
+      "day_type_running": "Neutral / D-like blend",
+      "bias": "Two-Sided, mild bullish recovery if acceptance reappears"
+    },
+    "ES": {
+      "role": "observance",
+      "gap": {"direction": "Down", "size": -30.50, "prior_close": 6692.00},
+      "ib": {
+        "high": 6672.50,
+        "low": 6631.25,
+        "first_re": {"direction": "Up", "time": "11:45"},
+        "acceptance": {"provisional": false, "confirmed": false}
+      },
+      "value_area": {"val": 6637.00, "poc": 6637.00, "vah": 6667.25},
+      "otf": "None",
+      "read": "Rotational; failed to confirm NQ up-acceptance"
+    },
+    "YM": {
+      "role": "observance",
+      "gap": {"direction": "Down", "size": -86, "prior_close": 46438},
+      "ib": {
+        "high": 46423,
+        "low": 46199,
+        "first_re": {"direction": "Up", "time": "10:40"},
+        "acceptance": {"provisional": false, "confirmed": false}
+      },
+      "value_area": {"val": 46267, "poc": 46371, "vah": 46430},
+      "otf": "None",
+      "read": "Heavier tone; did not validate NQ’s up-acceptance"
+    }
+  },
+  "confidence": {
+    "base_score": 40,
+    "bucket": "Weak-Moderate",
+    "components": {
+      "opening_gap": +20,
+      "re_status": +20,
+      "value_vs_yesterday": +12,
+      "day_type_clarity": +6,
+      "otf": 0,
+      "confluence_30m_15m": +8,
+      "prominent_poc": -5,
+      "dpoc": -6,
+      "hvn_lvn": 0,
+      "peers_adjustment": 0
+    },
+    "notes": "Earlier RE up achieved acceptance, but pm return to value, stable dPOC, no OTF, and peers failing to confirm reduce conviction."
+  },
+  "playbook": {
+    "plan_a": {
+      "id": "nq_rejoin_on_renewed_acceptance",
+      "context": "Earlier RE up achieved acceptance, but pm return to balance. Require renewed acceptance to rejoin.",
+      "triggers": [
+        "Two 15m closes above IBH + TPO build",
+        "One 30m hold above IBH"
+      ],
+      "entry": "Buy pullback to IBH that holds on 15m",
+      "exits": ["IB measured move", "Next HVN/node above"],
+      "invalidation": "30m close back inside IB; prominent POC overhead",
+      "sizing": "Normal only if ES stops rejecting and YM stops dragging; otherwise half",
+      "conviction": "Moderate if renewed acceptance, reduced by peer non-confirmation"
+    },
+    "plan_b": {
+      "id": "nq_edge_fade_no_acceptance",
+      "context": "If probes of VAH/IBH fail without acceptance and peers are weak.",
+      "triggers": [
+        "No 2×15m closes outside VAH/IBH",
+        "ES fails above its VA/IB",
+        "YM remains heavy"
+      ],
+      "entry": "Short 15m close back inside after failed probe",
+      "exits": ["VAH -> POC", "VAL if rotation expands"],
+      "invalidation": "Two 15m closes outside with build and one 30m hold",
+      "sizing": "Small–moderate; reduce if prominent POC forms",
+      "conviction": "Moderate; fade-friendly context"
+    }
+  },
+  "supporting_evidence": [
+    "NQ gap down, early RE up achieved acceptance, now back in VA",
+    "ES gap down, RE up but no acceptance",
+    "YM gap down, RE up but no acceptance",
+    "Peers not aligned; no OTF; dPOC stable",
+    "Confidence adjusted per v9.4.4 peer rules"
+  ]
+}
