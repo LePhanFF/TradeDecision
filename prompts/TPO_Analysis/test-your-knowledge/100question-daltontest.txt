@@ -1,0 +1,1005 @@
+TEST — Markets in Profile (James Dalton) — 100 MCQ
+Instructions:
+- Multiple choice (A–D). One correct answer per item.
+- Each item shows the correct option, a short rationale ("Why"), and a book footnote.
+- Evidence footnotes cite *Markets in Profile* (MiP) by page ranges.
+
+[ID] B-001 (Easy)
+Q: In Dalton's framework, markets alternate primarily between which two auction modes?
+A) Continuation and reversal
+B) Price discovery and value discovery
+C) Momentum and volatility
+D) Trend and mean reversion only
+Correct: B) Price discovery and value discovery
+Why: Auctions explore to find new prices, then consolidate acceptance into value.
+Evidence: [MiP — Auction basics & MGI, pp. 6-45]
+
+[ID] B-002 (Easy)
+Q: What best defines "value area" in Market Profile?
+A) The first hour's range only
+B) The range containing ~70% of TPOs around the POC
+C) The day's VWAP band
+D) The midpoint of the daily range
+Correct: B) The range containing ~70% of TPOs around the POC
+Why: Value is the ~70% TPO band centered on the most accepted price.
+Evidence: [MiP — Profile fundamentals, pp. 45-92]
+
+[ID] B-003 (Medium)
+Q: Which observation is strongest evidence of acceptance at a price area?
+A) A single rapid print through the level
+B) Multiple overlapping 30-minute periods at that level
+C) A gap that immediately fills
+D) A thin strip of single prints
+Correct: B) Multiple overlapping 30-minute periods at that level
+Why: Time spent and overlap reveal agreement on fair value.
+Evidence: [MiP — Acceptance and value, pp. 70-92, 165-225]
+
+[ID] B-004 (Medium)
+Q: Initial Balance (IB) is the:
+A) First 15 minutes
+B) First 60 minutes
+C) Range from overnight low to open
+D) Midpoint of the session
+Correct: B) First 60 minutes
+Why: Dalton defines IB as the first hour's high-low range.
+Evidence: [MiP — IB and range extension, pp. 70-92]
+
+[ID] B-005 (Medium)
+Q: Range extension (RE) most directly signals:
+A) Lack of participation
+B) New money activity outside the IB
+C) An imminent neutral day
+D) A guaranteed trend day
+Correct: B) New money activity outside the IB
+Why: RE indicates initiative interest beyond the first hour's range.
+Evidence: [MiP — IB/RE framework, pp. 70-92]
+
+[ID] B-006 (Medium)
+Q: "Excess" at the high is most clearly shown by:
+A) A flat top with many TPOs
+B) A long tail of single prints then rotation back
+C) A prominent POC near the high
+D) A gap up that fills
+Correct: B) A long tail of single prints then rotation back
+Why: Single-print tails mark rejection and an auction end at that extreme.
+Evidence: [MiP — Excess and rejection, pp. 103-157]
+
+[ID] B-007 (Easy)
+Q: The POC represents the price with:
+A) The least time spent
+B) The most TPOs or volume (most accepted price)
+C) The highest high
+D) The first traded price of the day
+Correct: B) The most TPOs or volume (most accepted price)
+Why: POC marks the center of acceptance and often acts as a magnet.
+Evidence: [MiP — POC behavior, pp. 45-92, 70-92]
+
+[ID] B-008 (Medium)
+Q: A "poor high" most strongly implies:
+A) The auction is complete
+B) The high lacked excess and may be repaired later
+C) Imminent trend continuation
+D) Low volume day
+Correct: B) The high lacked excess and may be repaired later
+Why: Poor extremes are unfinished auctions prone to revisit.
+Evidence: [MiP — Poor highs/lows, pp. 103-157]
+
+[ID] B-009 (Medium)
+Q: Which profile shape is commonly linked to short covering by weak shorts?
+A) D-shape
+B) P-shape
+C) b-shape
+D) Double distribution
+Correct: B) P-shape
+Why: P-shape shows lower stem and upper bulge typical of short covering.
+Evidence: [MiP — Shapes & inventory events, pp. 178-205]
+
+[ID] B-010 (Medium)
+Q: One-timeframing up is identified by:
+A) Each 30m bar makes a higher low
+B) Each 30m bar makes a lower high
+C) Both a higher high and lower low each bar
+D) A widening POC
+Correct: A) Each 30m bar makes a higher low
+Why: OTF persists until a bar takes out the prior bar's low.
+Evidence: [MiP — One-timeframing mechanics, pp. 199-225]
+
+[ID] B-011 (Medium)
+Q: During balance, which behavior is most likely?
+A) Persistent RE in one direction
+B) Mean-reversion rotations toward POC
+C) Immediate trend day
+D) Spike formation
+Correct: B) Mean-reversion rotations toward POC
+Why: In balance, acceptance near POC attracts rotations.
+Evidence: [MiP — D-day balance & magnets, pp. 70-92]
+
+[ID] B-012 (Easy)
+Q: "Market-generated information" (MGI) refers to:
+A) Economic forecasts
+B) What the market reveals through time, price, and structure
+C) Analyst recommendations
+D) Macro news headlines only
+Correct: B) What the market reveals through time, price, and structure
+Why: Dalton emphasizes reading behavior over predicting it.
+Evidence: [MiP — MGI concept, pp. 6-45]
+
+[ID] B-013 (Medium)
+Q: An "Open-Drive" (OD) suggests:
+A) Low confidence, two-sided early trade
+B) Strong confidence with directional intent from the open
+C) A guaranteed neutral day
+D) No range extension
+Correct: B) Strong confidence with directional intent from the open
+Why: OD drives away from the open with shallow pullbacks.
+Evidence: [MiP — Open types & confidence, pp. 70-92, 192-202]
+
+[ID] B-014 (Medium)
+Q: "Open-Test-Drive" (OTD) is characterized by:
+A) Rotation around the open
+B) A test of a reference then a drive away
+C) Immediate reversal through the open
+D) No clear test or drive
+Correct: B) A test of a reference then a drive away
+Why: The opening checks inventory at a reference before initiative control.
+Evidence: [MiP — Open types, pp. 70-92]
+
+[ID] B-015 (Medium)
+Q: "Open Rejection Reverse" (ORR) most often occurs when:
+A) The market gaps and holds
+B) The open tests above/below and quickly reverses through the open
+C) There is no test at all
+D) The day is non-trend
+Correct: B) The open tests above/below and quickly reverses through the open
+Why: ORR is a failed look that flips the auction direction early.
+Evidence: [MiP — ORR characteristics, pp. 70-92, 103-157]
+
+[ID] B-016 (Easy)
+Q: "Open Auction" (OA) typically implies:
+A) Persistent drive away from open
+B) Two-sided trade around the open, low early confidence
+C) Neutral-Extreme day
+D) Double distribution day
+Correct: B) Two-sided trade around the open, low early confidence
+Why: OA rotates around the open with limited range extension.
+Evidence: [MiP — Open types & balance, pp. 70-92, 192-202]
+
+[ID] B-017 (Medium)
+Q: A late-day "spike" up sets next-day bias if:
+A) Price opens and holds above the spike base (long bias)
+B) Price opens exactly at prior close
+C) Price opens below and sells off (long bias)
+D) There is no spike base
+Correct: A) Price opens and holds above the spike base (long bias)
+Why: Acceptance relative to the spike base drives the next day's lean.
+Evidence: [MiP — Spikes & next-day treatment, pp. 103-157]
+
+[ID] B-018 (Medium)
+Q: Which early read best hints at a D-shaped balance day?
+A) OD with fast RE
+B) OA with no RE and a widening POC
+C) ORR followed by OTF
+D) Gap-and-go
+Correct: B) OA with no RE and a widening POC
+Why: Two-sided auction with growing acceptance suggests balance.
+Evidence: [MiP — Day-type diagnostics, pp. 70-92]
+
+[ID] B-019 (Medium)
+Q: "Attempted direction" is evaluated by:
+A) Comparing open to close only
+B) Which side of the IB first extends and whether extension is accepted
+C) VWAP slope only
+D) Overnight range location only
+Correct: B) Which side of the IB first extends and whether extension is accepted
+Why: Attempted direction without acceptance is weak.
+Evidence: [MiP — Attempted direction via RE, pp. 70-92]
+
+[ID] B-020 (Medium)
+Q: A "prominent POC" tends to:
+A) Push price away
+B) Pull price back as a magnet
+C) End all trends
+D) Eliminate gaps
+Correct: B) Pull price back as a magnet
+Why: Heavy acceptance attracts revisits, especially in balance.
+Evidence: [MiP — Prominent POC behavior, pp. 70-92]
+
+[ID] B-021 (Medium)
+Q: In a "Neutral" day, range extension occurs:
+A) To neither side
+B) To both sides of the IB
+C) Only once upward
+D) Only once downward
+Correct: B) To both sides of the IB
+Why: Neutral structure has RE above and below, control assessed by close location.
+Evidence: [MiP — Day-type taxonomy, pp. 70-92, 165-205]
+
+[ID] B-022 (Medium)
+Q: "Neutral-Extreme" differs from "Neutral" mainly by:
+A) Having no RE
+B) Closing near one extreme
+C) Having a narrow IB
+D) Never trending next day
+Correct: B) Closing near one extreme
+Why: Neutral-Extreme signals strong late control with potential follow-through.
+Evidence: [MiP — Neutral vs neutral-extreme, pp. 70-92, 165-205]
+
+[ID] B-023 (Medium)
+Q: A "Trend Day" usually features:
+A) Minimal range extension
+B) Persistent one-timeframing and expanding range
+C) Flat POC and no RE
+D) Repeated returns to POC
+Correct: B) Persistent one-timeframing and expanding range
+Why: Initiative control drives continuous discovery.
+Evidence: [MiP — Trend day characteristics, pp. 70-92, 192-202]
+
+[ID] B-024 (Medium)
+Q: "Double Distribution Trend Day" (DD) often has:
+A) Three separate distributions
+B) Early trend, midday balance, late break to a second distribution
+C) No range extension at all
+D) Only OA behavior
+Correct: B) Early trend, midday balance, late break to a second distribution
+Why: Two distributions separated by a low-acceptance area is classic DD.
+Evidence: [MiP — DD structure, pp. 165-205]
+
+[ID] B-025 (Easy)
+Q: A "Normal" day typically has:
+A) Wide IB with little or no RE
+B) Narrow IB with big RE
+C) Gap-and-go behavior
+D) Neutral-Extreme close
+Correct: A) Wide IB with little or no RE
+Why: Day timeframe dominates, limiting extensions.
+Evidence: [MiP — Normal day, pp. 70-92]
+
+[ID] B-026 (Medium)
+Q: "Normal-Variation" day most often shows:
+A) No RE
+B) One-sided RE beyond a moderate IB
+C) RE on both sides
+D) Two distributions
+Correct: B) One-sided RE beyond a moderate IB
+Why: It is the most common day type with modest initiative.
+Evidence: [MiP — Normal-Variation, pp. 70-92]
+
+[ID] B-027 (Medium)
+Q: Non-Trend (Balance) day typically has:
+A) Large range with OTF
+B) Narrow range with no significant RE
+C) Gaps that hold
+D) Neutral-Extreme close
+Correct: B) Narrow range with no significant RE
+Why: Two-sided trade dominates and mean reversion prevails.
+Evidence: [MiP — Non-trend/D-day, pp. 70-92]
+
+[ID] B-028 (Medium)
+Q: Value migrating higher across days is confirmed by:
+A) Price up, value unchanged
+B) VAH, VAL, and POC all shifting up
+C) A single-day spike
+D) Overnight high above prior high
+Correct: B) VAH, VAL, and POC all shifting up
+Why: Value migration, not just price, reflects acceptance of higher levels.
+Evidence: [MiP — Value migration, pp. 165-225]
+
+[ID] B-029 (Medium)
+Q: High-volume nodes (HVN) tend to:
+A) Act as sticky areas where trade slows
+B) Act as fast lanes for price
+C) Always reverse price
+D) Eliminate gaps
+Correct: A) Act as sticky areas where trade slows
+Why: HVN are areas of past acceptance; price often rotates there.
+Evidence: [MiP — Nodes & behavior, pp. 45-92, 165-205]
+
+[ID] B-030 (Medium)
+Q: Low-volume nodes (LVN) tend to:
+A) Encourage fast travel once accepted beyond
+B) Force balance immediately
+C) Create permanent support
+D) Have no trading relevance
+Correct: A) Encourage fast travel once accepted beyond
+Why: Thin participation invites quick movement to the next node.
+Evidence: [MiP — LVN transitions, pp. 45-92, 165-205]
+
+[ID] B-031 (Medium)
+Q: The best early warning that one-timeframing up may be ending is:
+A) A higher low
+B) A bar that takes out the prior bar's low
+C) A wider POC
+D) A poor high
+Correct: B) A bar that takes out the prior bar's low
+Why: Taking out the opposite extreme ends the OTF sequence.
+Evidence: [MiP — One-timeframing rules, pp. 199-225]
+
+[ID] B-032 (Medium)
+Q: Overnight inventory "too long" most commonly resolves by:
+A) Further rally without test
+B) Long liquidation toward prior RTH close
+C) Immediate neutral day
+D) Trend day up
+Correct: B) Long liquidation toward prior RTH close
+Why: Imbalances often correct toward the reference early.
+Evidence: [MiP — Overnight inventory, pp. 178-188]
+
+[ID] B-033 (Medium)
+Q: A "spike base" is:
+A) The VWAP of the day
+B) The price level where a late fast move began
+C) The prior close
+D) The IB midpoint
+Correct: B) The price level where a late fast move began
+Why: Next-day acceptance relative to the base sets bias.
+Evidence: [MiP — Spikes & bases, pp. 103-157]
+
+[ID] B-034 (Medium)
+Q: The "day-trader's timeframe" is best described as:
+A) Longer-term investors
+B) Intraday participants driving rotations inside value
+C) Algorithmic market makers only
+D) Position traders
+Correct: B) Intraday participants driving rotations inside value
+Why: Day timeframe shapes balance dynamics.
+Evidence: [MiP — Timeframe taxonomy, pp. 178-205]
+
+[ID] B-035 (Medium)
+Q: Which is the cleanest read for a "Look Above and Fail" (LAB) in balance?
+A) Break above range, acceptance above, then continuation
+B) Brief look above range, swift return inside, acceptance back within box
+C) Flat top with wide POC
+D) Gap up that holds
+Correct: B) Brief look above range, swift return inside, acceptance back within box
+Why: Failed looks often traverse the range toward the opposite edge.
+Evidence: [MiP — Brackets & failures, pp. 165-205]
+
+[ID] B-036 (Medium)
+Q: The first target for LAB is commonly:
+A) New highs
+B) Box POC, then opposite edge
+C) Overnight mid
+D) VWAP only
+Correct: B) Box POC, then opposite edge
+Why: Traversal through balance often tags the center then the far side.
+Evidence: [MiP — Range traversal logic, pp. 165-205]
+
+[ID] B-037 (Medium)
+Q: Which is most consistent with a "Gap & Go Up" thesis?
+A) Quick return back into prior value
+B) Early acceptance above prior range with RE up
+C) OA around the open
+D) Poor high at the first extension
+Correct: B) Early acceptance above prior range with RE up
+Why: Acceptance outside prior value signals higher timeframe initiative.
+Evidence: [MiP — Gaps and acceptance, pp. 70-92, 165-205]
+
+[ID] B-038 (Medium)
+Q: "Gap Fade Down from Gap Up" is favored when:
+A) Acceptance persists above prior range
+B) Early return back into prior value shows lack of initiative
+C) Up OTF forms immediately
+D) Peers gap up and hold
+Correct: B) Early return back into prior value shows lack of initiative
+Why: Failure to accept outside negates gap-and-go.
+Evidence: [MiP — Gap failures, pp. 70-92]
+
+[ID] B-039 (Medium)
+Q: "Prominent POC magnet" caution suggests:
+A) Chasing breakouts through the POC
+B) Expect rotations to revisit that level
+C) Never trading near POC
+D) Ignoring acceptance
+Correct: B) Expect rotations to revisit that level
+Why: Wide acceptance tends to pull price back.
+Evidence: [MiP — Prominent POC, pp. 70-92]
+
+[ID] B-040 (Medium)
+Q: Which combination best signals upward value migration for trend continuation?
+A) Price up, value unchanged, falling volume
+B) Price up, VA up, POC up, acceptance above prior VAH
+C) Price up only
+D) Gap up that fully fills
+Correct: B) Price up, VA up, POC up, acceptance above prior VAH
+Why: Alignment of price and value confirms the higher auction.
+Evidence: [MiP — Value & acceptance alignment, pp. 165-225]
+
+[ID] B-041 (Medium)
+Q: In a Neutral day, assessing who controls into the close is best done by:
+A) Measuring VWAP distance only
+B) Where price closes relative to the day's extremes and acceptance
+C) Counting TPO letters
+D) Overnight high/low
+Correct: B) Where price closes relative to the day's extremes and acceptance
+Why: Close location after both-side RE reveals late-day control.
+Evidence: [MiP — Neutral vs neutral-extreme, pp. 70-92, 165-205]
+
+[ID] B-042 (Medium)
+Q: The most common day type per Dalton is:
+A) Trend day
+B) Neutral day
+C) Normal-Variation day
+D) Non-trend day
+Correct: C) Normal-Variation day
+Why: A moderate IB with one-sided RE is most frequent.
+Evidence: [MiP — Day-type frequencies (discussion), pp. 70-92]
+
+[ID] B-043 (Medium)
+Q: If RE up is accepted but on very low volume, you should:
+A) Treat as high confidence
+B) Treat as suspect and watch for failure back into IB
+C) Ignore volume
+D) Assume DD day
+Correct: B) Treat as suspect and watch for failure back into IB
+Why: Participation validates initiative; weak volume raises failure risk.
+Evidence: [MiP — Participation context, pp. 45-92]
+
+[ID] B-044 (Medium)
+Q: Which is the best execution logic on an "IB Breakout Success" long?
+A) Buy far above the break without reference
+B) Buy the retest of IB high that holds (acceptance)
+C) Buy before any test
+D) Only buy at the close
+Correct: B) Buy the retest of IB high that holds (acceptance)
+Why: Acceptance at the edge defines risk and confirms new money.
+Evidence: [MiP — IB/RE execution, pp. 70-92]
+
+[ID] B-045 (Medium)
+Q: One-timeframing up with value up and rising dPOC implies:
+A) Counter-trend fading only
+B) Go-with bias until OTF breaks
+C) Neutral bias
+D) Immediate reversal
+Correct: B) Go-with bias until OTF breaks
+Why: Persistence of control plus value formation supports continuation.
+Evidence: [MiP — OTF & value alignment, pp. 199-225, 70-92]
+
+[ID] B-046 (Hard)
+Q: A D-shaped profile with poor high and no RE suggests the highest-probability trade is:
+A) Momentum breakout long
+B) Fade VAH toward POC
+C) Buy spike base
+D) Short LVN break
+Correct: B) Fade VAH toward POC
+Why: Balance context favors mean reversion; poor high warns of repair risk later.
+Evidence: [MiP — Balance tactics & poor extremes, pp. 70-92, 103-157]
+
+[ID] B-047 (Medium)
+Q: The "attempted direction" that fails repeatedly without acceptance usually results in:
+A) Trend continuation in that direction
+B) Return to balance inside IB/value
+C) Gap the next day
+D) Double distribution day
+Correct: B) Return to balance inside IB/value
+Why: Without acceptance, initiative attempts revert to two-sided trade.
+Evidence: [MiP — Attempted direction, pp. 70-92]
+
+[ID] B-048 (Medium)
+Q: "Inventory too short" during a P-shape day implies:
+A) Short covering rallies are likely
+B) Long liquidation
+C) Flat trading
+D) Neutral day only
+Correct: A) Short covering rallies are likely
+Why: Shorts buying to exit can squeeze price upward.
+Evidence: [MiP — Inventory imbalances, pp. 178-205]
+
+[ID] B-049 (Medium)
+Q: For an LVN Break & Accept -> Next Node long, the cleanest add is when:
+A) Price immediately runs with no retest
+B) The LVN is retested from above and holds
+C) The HVN caps price
+D) The open was OA
+Correct: B) The LVN is retested from above and holds
+Why: Successful retest confirms acceptance beyond the thin zone.
+Evidence: [MiP — LVN transitions, pp. 45-92, 165-205]
+
+[ID] B-050 (Medium)
+Q: "Peer gap close" confirmation means:
+A) Ignore other indices
+B) If ES is fading a gap, similar gap-closing in NQ/YM boosts conviction
+C) Only ES matters
+D) Peer confirmation is irrelevant
+Correct: B) If ES is fading a gap, similar gap-closing in NQ/YM boosts conviction
+Why: Cross-market alignment strengthens the read.
+Evidence: [MiP — Context & cross-market cues, pp. 165-205]
+
+[ID] B-051 (Medium)
+Q: When price accepts beyond an LVN and travels quickly, the next structural target is often:
+A) The prior close only
+B) The next HVN/LVN node ahead
+C) The IB midpoint
+D) The overnight mid
+Correct: B) The next HVN/LVN node ahead
+Why: Markets segment into nodes; travel tends to connect them.
+Evidence: [MiP — Node-to-node travel, pp. 45-92, 165-205]
+
+[ID] B-052 (Medium)
+Q: "Single prints" indicate:
+A) Heavy acceptance
+B) Low acceptance left by fast movement
+C) VWAP confluence
+D) Neutral day
+Correct: B) Low acceptance left by fast movement
+Why: These thin areas are often revisited unless trend persists strongly.
+Evidence: [MiP — Single prints & acceptance, pp. 45-92, 103-157]
+
+[ID] B-053 (Medium)
+Q: A "prominent POC" not yet revisited within the session suggests:
+A) Potential magnet pull later
+B) Immediate trend continuation
+C) Disregard it
+D) Guaranteed reversal at the POC
+Correct: A) Potential magnet pull later
+Why: Wide acceptance often attracts price back before the session ends.
+Evidence: [MiP — Prominent POC as magnet, pp. 70-92]
+
+[ID] B-054 (Hard)
+Q: Which combination most undermines a "Gap & Go Up" idea?
+A) RE up with strong volume and OTF
+B) Acceptance above prior range plus dPOC rising
+C) OA, quick return into prior value, peers filling their gaps
+D) Value up day-over-day
+Correct: C) OA, quick return into prior value, peers filling their gaps
+Why: Loss of acceptance and peer disagreement favor fading the gap.
+Evidence: [MiP — Gap failures & context, pp. 70-92, 165-205]
+
+[ID] B-055 (Medium)
+Q: A "Double Distribution" day’s late break is best traded by:
+A) Fading the break
+B) Going with the break after acceptance beyond the midday ledge
+C) Ignoring structure
+D) Waiting for the close
+Correct: B) Going with the break after acceptance beyond the midday ledge
+Why: The second distribution offers continuation once accepted.
+Evidence: [MiP — DD execution, pp. 165-205]
+
+[ID] B-056 (Medium)
+Q: "Confidence" in Dalton's sense is primarily inferred from:
+A) Earnings reports
+B) Open behavior, RE, breadth of participation, and follow-through
+C) Overnight range only
+D) VWAP slope alone
+Correct: B) Open behavior, RE, breadth of participation, and follow-through
+Why: High confidence days show drive and persistence.
+Evidence: [MiP — Confidence diagnostics, pp. 192-202]
+
+[ID] B-057 (Medium)
+Q: "Context" means:
+A) Only today's price levels
+B) Where today's auction sits within higher-timeframe structure and yesterday's references
+C) Only macro news
+D) Only overnight range
+Correct: B) Where today's auction sits within higher-timeframe structure and yesterday's references
+Why: Context turns prints into decisions.
+Evidence: [MiP — Context building, pp. 6-45, 165-225]
+
+[ID] B-058 (Medium)
+Q: Which best describes "top-down" preparation?
+A) Starting from the smallest timeframe only
+B) Starting from higher timeframes, mapping references, then drilling down
+C) Trading only the open
+D) Ignoring prior value
+Correct: B) Starting from higher timeframes, mapping references, then drilling down
+Why: Top-down prep frames the day with structural references.
+Evidence: [MiP — Prep & reference mapping, pp. 165-205]
+
+[ID] B-059 (Medium)
+Q: "One-timeframing down" ends when:
+A) A bar makes a higher high than the prior bar
+B) A bar makes a lower low
+C) Volume increases
+D) The POC widens
+Correct: A) A bar makes a higher high than the prior bar
+Why: Taking out the opposite extreme ends the OTF sequence.
+Evidence: [MiP — One-timeframing rules, pp. 199-225]
+
+[ID] B-060 (Medium)
+Q: Which is a classic early sign of "Normal" day potential?
+A) Very wide IB via OA and no RE
+B) Immediate OD and large RE
+C) Neutral-Extreme close
+D) Double distribution midday
+Correct: A) Very wide IB via OA and no RE
+Why: Wide IB limits extension odds.
+Evidence: [MiP — Normal day tells, pp. 70-92]
+
+[ID] B-061 (Medium)
+Q: A "spike down" into the close sets next-day short bias when:
+A) The next day opens and holds above spike base
+B) The next day opens and holds below spike base
+C) There is no gap
+D) The next day is OA
+Correct: B) The next day opens and holds below spike base
+Why: Acceptance below the base extends initiative lower.
+Evidence: [MiP — Spikes and bias, pp. 103-157]
+
+[ID] B-062 (Medium)
+Q: The primary risk of fading a poor low inside balance is:
+A) It will never repair
+B) It may repair quickly if sellers reassert
+C) It guarantees a trend
+D) It eliminates RE
+Correct: B) It may repair quickly if sellers reassert
+Why: Poor extremes often get fixed when pressure returns.
+Evidence: [MiP — Poor extremes & repair, pp. 103-157]
+
+[ID] B-063 (Medium)
+Q: In a "Normal-Variation" up day, the highest-odds continuation entry is often:
+A) Buying far above the first extension
+B) Buying a pullback to IB high that holds
+C) Buying only at the close
+D) Fading the first extension
+Correct: B) Buying a pullback to IB high that holds
+Why: Acceptance at IB edge supports continuation.
+Evidence: [MiP — NV execution, pp. 70-92]
+
+[ID] B-064 (Medium)
+Q: The early sign that a "Neutral" day could become "Neutral-Extreme" is:
+A) No RE at all
+B) Late-day push that holds near an extreme into the close
+C) A prominent POC
+D) OA open
+Correct: B) Late-day push that holds near an extreme into the close
+Why: Extreme close signals control into next session.
+Evidence: [MiP — Neutral-Extreme, pp. 70-92, 165-205]
+
+[ID] B-065 (Medium)
+Q: The most actionable use of HVN is to:
+A) Assume always reversal
+B) Expect chop/slowdown and manage expectations near it
+C) Always break through quickly
+D) Ignore them
+Correct: B) Expect chop/slowdown and manage expectations near it
+Why: HVN are accepted zones that slow travel.
+Evidence: [MiP — HVN behavior, pp. 45-92, 165-205]
+
+[ID] B-066 (Medium)
+Q: "Developing POC" (dPOC) helps intraday by:
+A) Replacing final POC
+B) Showing where value is forming in real time
+C) Predicting earnings
+D) Eliminating RE signals
+Correct: B) Showing where value is forming in real time
+Why: dPOC migration with price supports bias and conviction.
+Evidence: [MiP — Developing value, pp. 70-92]
+
+[ID] B-067 (Medium)
+Q: A "b-shape" day most often reflects:
+A) Short covering
+B) Long liquidation
+C) Neutral day
+D) Non-trend day only
+Correct: B) Long liquidation
+Why: Upper tail and lower bulge show selling pressure from trapped longs.
+Evidence: [MiP — Shapes & liquidation, pp. 178-205]
+
+[ID] B-068 (Hard)
+Q: Which combination best argues for standing aside on a breakout long through VAH?
+A) Rising dPOC, value up, LVN above
+B) OA, prominent POC above, peers diverging, low volume
+C) OD up, accepted RE up
+D) Spike base below, acceptance above
+Correct: B) OA, prominent POC above, peers diverging, low volume
+Why: Multiple headwinds lower breakout expectancy.
+Evidence: [MiP — Context and expectancy, pp. 165-205, 192-202]
+
+[ID] B-069 (Medium)
+Q: "Attempted direction" becomes meaningful when:
+A) It occurs during OA only
+B) It is followed by acceptance beyond the IB
+C) It happens in overnight session only
+D) It coincides with a wider POC
+Correct: B) It is followed by acceptance beyond the IB
+Why: Without acceptance, attempts lack conviction.
+Evidence: [MiP — Attempted direction & acceptance, pp. 70-92]
+
+[ID] B-070 (Medium)
+Q: Which open type most commonly precedes a balance day?
+A) OD
+B) OTD
+C) ORR
+D) OA
+Correct: D) OA
+Why: OA implies two-sided trade and lower early confidence.
+Evidence: [MiP — Open types & balance odds, pp. 70-92]
+
+[ID] B-071 (Medium)
+Q: A "Normal" day often ends where relative to POC?
+A) Very far away
+B) Rotating around or not far from POC
+C) At an extreme
+D) Above VAH
+Correct: B) Rotating around or not far from POC
+Why: Two-sided trade centers near acceptance.
+Evidence: [MiP — Normal day outcomes, pp. 70-92]
+
+[ID] B-072 (Medium)
+Q: "Value vs. price" means:
+A) Price alone determines opportunity
+B) Value formation (time/acceptance) is distinct from price exploration
+C) Volume alone determines value
+D) They are identical
+Correct: B) Value formation (time/acceptance) is distinct from price exploration
+Why: Time and acceptance define value; price can probe without acceptance.
+Evidence: [MiP — Price vs value, pp. 6-45, 45-92]
+
+[ID] B-073 (Medium)
+Q: A "late day spike" down with next-day open above the spike base implies:
+A) Short bias unless base fails
+B) Long bias while above base
+C) Neutral regardless of base
+D) Guaranteed trend day up
+Correct: B) Long bias while above base
+Why: Acceptance relative to base governs next-day lean.
+Evidence: [MiP — Spike treatment, pp. 103-157]
+
+[ID] B-074 (Medium)
+Q: When RE fails back into the IB, the higher-odds tactic is usually:
+A) Go-with continuation
+B) Fade back into balance toward POC
+C) Wait for the close only
+D) Assume trend
+Correct: B) Fade back into balance toward POC
+Why: Failed initiative returns to two-sided trade.
+Evidence: [MiP — RE failure logic, pp. 70-92]
+
+[ID] B-075 (Medium)
+Q: Which best signals "trend day down" developing?
+A) OA with no RE
+B) ORR down followed by down OTF and expanding range
+C) Gap up that fills
+D) Prominent POC below
+Correct: B) ORR down followed by down OTF and expanding range
+Why: Failed look and persistent control define trend day behavior.
+Evidence: [MiP — Trend tells, pp. 70-92, 192-202]
+
+[ID] B-076 (Medium)
+Q: "Prominent POC overhead" in an up move suggests:
+A) Headwind and magnet risk above
+B) Clear path higher
+C) No effect
+D) Immediate reversal
+Correct: A) Headwind and magnet risk above
+Why: Wide acceptance can stall or pull price back.
+Evidence: [MiP — Prominent POC cautions, pp. 70-92]
+
+[ID] B-077 (Medium)
+Q: "Overnight high above prior RTH high" without acceptance at the open often leads to:
+A) Immediate breakout
+B) Inventory correction toward prior close
+C) Guaranteed trend up
+D) Neutral-Extreme
+Correct: B) Inventory correction toward prior close
+Why: Overnight imbalances tend to correct early.
+Evidence: [MiP — Overnight inventory & open, pp. 178-188]
+
+[ID] B-078 (Medium)
+Q: "Single prints left behind" during an up drive are best treated as:
+A) Permanent support
+B) Low-acceptance areas that may be revisited if initiative wanes
+C) Signals to fade immediately
+D) Irrelevant
+Correct: B) Low-acceptance areas that may be revisited if initiative wanes
+Why: Thin areas are susceptible to backfill absent persistent control.
+Evidence: [MiP — Single prints behavior, pp. 103-157]
+
+[ID] B-079 (Hard)
+Q: A "Neutral-Extreme up" close with value up implies next-day odds favor:
+A) Continuation higher if acceptance persists above key references
+B) Immediate gap fill only
+C) Return to POC
+D) No signal
+Correct: A) Continuation higher if acceptance persists above key references
+Why: Extreme close with value up carries momentum into next session.
+Evidence: [MiP — Neutral-Extreme implications, pp. 165-205]
+
+[ID] B-080 (Medium)
+Q: Which factor least contributes to Dalton's notion of "confidence"?
+A) Breadth of participation
+B) Follow-through after RE
+C) Corporate earnings reports
+D) Opening behavior
+Correct: C) Corporate earnings reports
+Why: Confidence is inferred from the auction's behavior, not external news.
+Evidence: [MiP — Confidence signals, pp. 192-202]
+
+[ID] B-081 (Medium)
+Q: A "Balance Box" is:
+A) A formal indicator
+B) A hand-drawn recent range used to frame LAB/LBF
+C) A VWAP band
+D) The overnight range
+Correct: B) A hand-drawn recent range used to frame LAB/LBF
+Why: Visual boxes help detect failed looks and targets.
+Evidence: [MiP — Bracketing technique, pp. 165-205]
+
+[ID] B-082 (Medium)
+Q: In a developing uptrend, which sequence is strongest?
+A) Price up, value down, peers diverging
+B) Price up, value up, dPOC rising, peers confirming
+C) Price up only, no value change
+D) Price up, poor high
+Correct: B) Price up, value up, dPOC rising, peers confirming
+Why: Alignment across value, intraday formation, and markets improves odds.
+Evidence: [MiP — Multi-cue alignment, pp. 165-225]
+
+[ID] B-083 (Medium)
+Q: "Attempted direction up" with immediate failure and acceptance back inside IB suggests:
+A) Continue buying
+B) Expect balance; fade extremes
+C) Trend day up anyway
+D) Spike likely
+Correct: B) Expect balance; fade extremes
+Why: Failed attempt returns control to day timeframe.
+Evidence: [MiP — Attempted direction failures, pp. 70-92]
+
+[ID] B-084 (Medium)
+Q: The most conservative stop for an IB breakout retest entry is placed:
+A) Nowhere; use mental stop
+B) Just back inside the IB
+C) At session low
+D) At VWAP
+Correct: B) Just back inside the IB
+Why: Acceptance is invalidated by re-entry inside the IB.
+Evidence: [MiP — IB retest risk placement, pp. 70-92]
+
+[ID] B-085 (Medium)
+Q: Which is the cleanest sign of "value down" day-over-day?
+A) Price down, value unchanged
+B) VAH, VAL, and POC all shift lower
+C) Gap down that fills
+D) Overnight low lower
+Correct: B) VAH, VAL, and POC all shift lower
+Why: Value migration reflects acceptance of lower prices.
+Evidence: [MiP — Value migration, pp. 165-225]
+
+[ID] B-086 (Medium)
+Q: "One-timeframing" provides:
+A) Perfect prediction
+B) A simple condition to ride persistence until it ends
+C) A VWAP substitute
+D) Only entry signals
+Correct: B) A simple condition to ride persistence until it ends
+Why: OTF offers a binary definition for trend persistence.
+Evidence: [MiP — OTF usage, pp. 199-225]
+
+[ID] B-087 (Medium)
+Q: "Excess" is most actionable when:
+A) It appears mid-range
+B) It prints at extremes with context alignment
+C) It appears at VWAP
+D) It accompanies OA
+Correct: B) It prints at extremes with context alignment
+Why: Excess confirms an auction end; use it with references.
+Evidence: [MiP — Excess & context, pp. 103-157]
+
+[ID] B-088 (Medium)
+Q: A "prominent POC below" while price is above suggests:
+A) A magnet risk beneath that can pull price back
+B) Immediate continuation up
+C) No effect
+D) Neutral day guaranteed
+Correct: A) A magnet risk beneath that can pull price back
+Why: Heavy acceptance below can stall rallies.
+Evidence: [MiP — POC magnet risk, pp. 70-92]
+
+[ID] B-089 (Hard)
+Q: During a potential "Normal-Variation up" day, which development negates continuation odds the most?
+A) Accepted RE up
+B) OTF up
+C) Return back inside IB with acceptance and falling volume
+D) Peer confirmation higher
+Correct: C) Return back inside IB with acceptance and falling volume
+Why: Loss of initiative and weak participation undermine the thesis.
+Evidence: [MiP — NV failure modes, pp. 70-92, 45-92]
+
+[ID] B-090 (Medium)
+Q: The main behavioral difference between HVN and LVN is:
+A) HVN speeds travel; LVN slows it
+B) HVN slows/attracts; LVN enables quick travel when accepted beyond
+C) Neither matters
+D) Both only slow travel
+Correct: B) HVN slows/attracts; LVN enables quick travel when accepted beyond
+Why: Nodes reflect past acceptance versus thin participation.
+Evidence: [MiP — Node dynamics, pp. 45-92, 165-205]
+
+[ID] B-091 (Medium)
+Q: "Context first, trade second" means you should:
+A) Enter before mapping references
+B) Map higher-timeframe references and yesterday's value before engaging intraday
+C) Trade only the open
+D) Ignore IB
+Correct: B) Map higher-timeframe references and yesterday's value before engaging intraday
+Why: Preparation anchors decisions to structure.
+Evidence: [MiP — Top-down prep, pp. 165-205]
+
+[ID] B-092 (Medium)
+Q: Which close location most often signals potential continuation next day?
+A) Middle of range
+B) Near an extreme with acceptance (e.g., Neutral-Extreme)
+C) At POC
+D) Slightly above VWAP
+Correct: B) Near an extreme with acceptance (e.g., Neutral-Extreme)
+Why: Extreme close reflects late control that can carry forward.
+Evidence: [MiP — Close location inference, pp. 165-205]
+
+[ID] B-093 (Medium)
+Q: The safer fade in balance is usually:
+A) Fading mid-range
+B) Fading VAH/VAL with rejection back toward POC
+C) Fading every tick
+D) Fading gaps blindly
+Correct: B) Fading VAH/VAL with rejection back toward POC
+Why: Edges with rejection define risk and target the magnet.
+Evidence: [MiP — Balance tactics, pp. 70-92]
+
+[ID] B-094 (Medium)
+Q: Which combo often precedes "Double Distribution" formation?
+A) Immediate two distributions
+B) Early initiative run, midday balance, late break
+C) OA with no RE all day
+D) Neutral day
+Correct: B) Early initiative run, midday balance, late break
+Why: DD features two distributions separated by a low-acceptance area.
+Evidence: [MiP — DD characteristics, pp. 165-205]
+
+[ID] B-095 (Medium)
+Q: A "gap close" target refers to:
+A) Closing the session's VWAP
+B) Price returning to tag the prior RTH close
+C) Filling the overnight range
+D) Tagging the IB midpoint
+Correct: B) Price returning to tag the prior RTH close
+Why: Common mean-reversion objective after failed gap-and-go.
+Evidence: [MiP — Gap close behavior, pp. 70-92]
+
+[ID] B-096 (Medium)
+Q: "Poor low" warns that:
+A) The low had strong excess and is durable
+B) The low is unfinished and may be repaired later
+C) A spike is certain
+D) Volume was highest there
+Correct: B) The low is unfinished and may be repaired later
+Why: Lack of excess invites future test.
+Evidence: [MiP — Poor extremes, pp. 103-157]
+
+[ID] B-097 (Hard)
+Q: In a developing uptrend, which headwind most reduces breakout expectancy above VAH?
+A) Rising dPOC
+B) Prominent HVN immediately overhead and peers diverging
+C) Accepted RE up
+D) Value up
+Correct: B) Prominent HVN immediately overhead and peers diverging
+Why: Sticky acceptance above and lack of confirmation reduce odds.
+Evidence: [MiP — HVN headwinds & context, pp. 165-205]
+
+[ID] B-098 (Medium)
+Q: "Open-Test-Drive" long entry is best executed:
+A) Before any test
+B) After a clean test of a known reference holds and the drive begins
+C) Only at the close
+D) Only if OA
+Correct: B) After a clean test of a known reference holds and the drive begins
+Why: The test validates inventory; the drive confirms intent.
+Evidence: [MiP — OTD execution, pp. 70-92]
+
+[ID] B-099 (Medium)
+Q: "Open Auction" often leads to which trade focus?
+A) Go-with breakouts
+B) Mean reversion at value edges
+C) Chasing spikes
+D) Ignoring references
+Correct: B) Mean reversion at value edges
+Why: Two-sided early trade favors fading VAH/VAL toward POC.
+Evidence: [MiP — OA implications, pp. 70-92]
+
+[ID] B-100 (Medium)
+Q: The cleanest end to down one-timeframing is:
+A) Another lower high
+B) A 30m bar prints a higher high than the prior bar
+C) A prominent POC
+D) A gap up
+Correct: B) A 30m bar prints a higher high than the prior bar
+Why: Taking out the opposite extreme ends the OTF sequence.
+Evidence: [MiP — One-timeframing rules, pp. 199-225]
