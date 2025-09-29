@@ -1,5 +1,7 @@
-// NinjaAddOnTPO.cs - clean Start()/Stop() and stable OnBar JSON builder
+// NinjaAddOnTPO.cs - runtime fixes: safe UpdateHeader + instrument resolution
 using System;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using System.Windows;
@@ -25,20 +27,14 @@ namespace NinjaTrader.NinjaScript.AddOns
         private Journal journal;
         private UiHostWindow ui;
 
-        private System.Windows.Threading.Dispatcher Disp
-        {
-            get { return Application.Current != null ? Application.Current.Dispatcher : null; }
-        }
-
-        private readonly string[] instrumentNames = new string[] { "ES ##-##", "NQ ##-##", "YM ##-##" };
+        // Default front-month fallbacks; can be overridden with instruments.txt
+        private readonly string[] defaultInstrumentNames = new string[] { "NQ 12-25", "ES 12-25", "YM 12-25" };
         private readonly string baseDir = System.IO.Path.Combine(NinjaTrader.Core.Globals.UserDataDir, "NinjaAddOn", "TPOAddon");
 
         protected override void OnWindowCreated(Window w)
         {
-            var cc = w as ControlCenter;
-            if (cc == null) return;
-            var newMenu = cc.FindFirst("ControlCenterMenuItemNew") as NTMenuItem;
-            if (newMenu == null) return;
+            var cc = w as ControlCenter; if (cc == null) return;
+            var newMenu = cc.FindFirst("ControlCenterMenuItemNew") as NTMenuItem; if (newMenu == null) return;
 
             if (menuItem == null)
             {
@@ -47,19 +43,14 @@ namespace NinjaTrader.NinjaScript.AddOns
                     Header = "NinjaAddOn TPO " + VersionTag,
                     Style = Application.Current.TryFindResource("MainMenuItem") as Style
                 };
-                menuItem.Click += (s, e) =>
-                {
-                    if (!isRunning) Start();
-                    else Stop();
-                };
+                menuItem.Click += (s, e) => { if (!isRunning) Start(); else Stop(); };
                 newMenu.Items.Add(menuItem);
             }
         }
 
         protected override void OnWindowDestroyed(Window w)
         {
-            var cc = w as ControlCenter;
-            if (cc == null) return;
+            var cc = w as ControlCenter; if (cc == null) return;
 
             if (menuItem != null)
             {
@@ -100,14 +91,16 @@ namespace NinjaTrader.NinjaScript.AddOns
                 engine = new DataEngine();
                 engine.BarComputed += OnBar;
 
-                var list = new List<Instrument>();
-                for (int i = 0; i < instrumentNames.Length; i++)
+                // Resolve instruments (config -> fallback)
+                var instruments = ResolveInstruments();
+                if (instruments.Count == 0)
                 {
-                    var inst = Instrument.GetInstrument(instrumentNames[i]);
-                    if (inst != null) list.Add(inst);
-                    else SafeOut("[TPO] Missing instrument: " + instrumentNames[i]);
+                    SafeOut("[TPO] No instruments resolved. Create " + System.IO.Path.Combine(baseDir, "instruments.txt") + " with one symbol per line (e.g., 'NQ 12-25').");
                 }
-                engine.Start(list);
+                else
+                {
+                    engine.Start(instruments);
+                }
 
                 isRunning = true;
                 UpdateHeader();
@@ -135,7 +128,6 @@ namespace NinjaTrader.NinjaScript.AddOns
 
                 if (ui != null)
                 {
-                    // Close on the window's dispatcher
                     ui.Dispatcher.BeginInvoke(new Action(() => { try { ui.Close(); } catch { } }));
                     ui = null;
                 }
@@ -148,13 +140,73 @@ namespace NinjaTrader.NinjaScript.AddOns
             }
         }
 
+        // NEW: Always marshal via the menu item's own Dispatcher and guard against shutdown
         private void UpdateHeader()
         {
             string h = isRunning ? "Stop NinjaAddOn TPO " + VersionTag : "NinjaAddOn TPO " + VersionTag;
-            var d = Disp;
-            if (d != null && !d.CheckAccess())
-                d.BeginInvoke(new Action(() => { if (menuItem != null) menuItem.Header = h; }));
-            else if (menuItem != null) menuItem.Header = h;
+            var mi = menuItem;
+            if (mi == null) return;
+
+            var d = mi.Dispatcher != null ? mi.Dispatcher : (Application.Current != null ? Application.Current.Dispatcher : null);
+            if (d == null) return;
+            if (d.HasShutdownStarted || d.HasShutdownFinished) return;
+
+            if (d.CheckAccess())
+            {
+                try { mi.Header = h; } catch (Exception ex) { SafeOut("[TPO] UpdateHeader direct error: " + ex.Message); }
+            }
+            else
+            {
+                d.BeginInvoke(new Action(() =>
+                {
+                    try { if (menuItem != null) menuItem.Header = h; } catch (Exception ex) { SafeOut("[TPO] UpdateHeader invoke error: " + ex.Message); }
+                }));
+            }
+        }
+
+        private List<Instrument> ResolveInstruments()
+        {
+            var list = new List<Instrument>();
+            string cfg = System.IO.Path.Combine(baseDir, "instruments.txt");
+            string[] names = defaultInstrumentNames;
+
+            try
+            {
+                if (File.Exists(cfg))
+                {
+                    var raw = File.ReadAllLines(cfg);
+                    var cleaned = raw.Select(x => (x ?? string.Empty).Trim())
+                                     .Where(x => x.Length > 0 && !x.StartsWith("#"))
+                                     .Distinct(StringComparer.OrdinalIgnoreCase)
+                                     .ToArray();
+                    if (cleaned.Length > 0) names = cleaned;
+                }
+            }
+            catch (Exception ex)
+            {
+                SafeOut("[TPO] Could not read instruments.txt: " + ex.Message);
+            }
+
+            foreach (var n in names)
+            {
+                try
+                {
+                    var inst = Instrument.GetInstrument(n);
+                    if (inst != null)
+                    {
+                        list.Add(inst);
+                    }
+                    else
+                    {
+                        SafeOut("[TPO] Instrument not found: " + n);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    SafeOut("[TPO] Resolve instrument failed for " + n + ": " + ex.Message);
+                }
+            }
+            return list;
         }
 
         private void OnBar(object sender, BarComputedEventArgs e)
@@ -184,7 +236,7 @@ namespace NinjaTrader.NinjaScript.AddOns
                         e.IB.Low,
                         e.Profile.Poc,
                         e.Profile.Val,  // VAL
-                        e.Profile.Poc,  // POC in middle for display consistency
+                        e.Profile.Poc,  // POC (display middle)
                         e.Profile.Vah,  // VAH
                         (e.Profile.Singles != null ? e.Profile.Singles.Count : 0),
                         (e.Otf.Up ? "Up" : (e.Otf.Down ? "Down" : "-")),
@@ -320,10 +372,18 @@ namespace NinjaTrader.NinjaScript.AddOns
 
         private void SafeOut(string s)
         {
-            var d = Disp;
-            if (d != null && !d.CheckAccess())
-                d.BeginInvoke(new Action(() => { NinjaTrader.Code.Output.Process(s, PrintTo.OutputTab1); }));
-            else NinjaTrader.Code.Output.Process(s, PrintTo.OutputTab1);
+            try
+            {
+                var d = (menuItem != null && menuItem.Dispatcher != null) ? menuItem.Dispatcher : (Application.Current != null ? Application.Current.Dispatcher : null);
+                if (d != null && !d.CheckAccess())
+                    d.BeginInvoke(new Action(() => { NinjaTrader.Code.Output.Process(s, PrintTo.OutputTab1); }));
+                else
+                    NinjaTrader.Code.Output.Process(s, PrintTo.OutputTab1);
+            }
+            catch
+            {
+                // last resort: swallow logging errors
+            }
         }
     }
 }

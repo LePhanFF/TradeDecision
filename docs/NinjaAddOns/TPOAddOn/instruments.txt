@@ -1,0 +1,6 @@
+# instruments.txt
+# One instrument per line. This overrides built-in defaults.
+# Example (front-month as of late Sep 2025):
+NQ 12-25
+ES 12-25
+YM 12-25
