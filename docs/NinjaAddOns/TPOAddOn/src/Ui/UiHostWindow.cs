@@ -1,4 +1,3 @@
-// UiHostWindow.cs - clean, NT8-safe, matched braces, no top-level code
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -10,28 +9,26 @@ using NinjaTrader.NinjaScript.AddOns.Core;
 
 namespace NinjaTrader.NinjaScript.AddOns.Ui
 {
-    // Code-behind only (no XAML). All UI updates marshaled to Dispatcher.
     public class UiHostWindow : NTWindow
     {
-        private TextBlock lastUpdated;
-        private TextBlock bias;
-        private TextBlock dayType;
-        private TextBlock confidence;
-        private TextBlock morph;
+        private TextBlock lastUpdated, bias, dayType, confidence, morph;
         private Border flag;
-        private TextBox commentary;
-        private TextBox evidence;
+        private TextBox commentary, evidence;
         private Canvas dpoc;
-
         private IList<DpocPoint> _trail;
 
         public UiHostWindow()
         {
-            try { this.Caption = "TPO v9.4.3 — Session Monitor"; } catch { /* NT build without Caption */ }
-            this.Title = "TPO v9.4.3 — Session Monitor";
-            this.Width = 900;
-            this.Height = 600;
+            this.Caption = "TPO v9.4.4 — Session Monitor";
+            this.Width = 950;
+            this.Height = 650;
             this.ResizeMode = ResizeMode.CanResize;
+
+            // Professional theme defaults
+            this.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));     // #1E1E1E
+            this.Foreground = new SolidColorBrush(Color.FromRgb(224, 224, 224));  // #E0E0E0
+            this.FontFamily = new FontFamily("Segoe UI");
+            this.FontSize = 13;
 
             var grid = new Grid { Margin = new Thickness(10) };
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
@@ -40,13 +37,14 @@ namespace NinjaTrader.NinjaScript.AddOns.Ui
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(3, GridUnitType.Star) });
             this.Content = grid;
 
+            // Header
             var header = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 10) };
-            lastUpdated = new TextBlock { Text = "Last Updated (ET): --:--:--", FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 20, 0) };
-            flag        = new Border { Width = 14, Height = 14, Background = Brushes.Gold, Margin = new Thickness(0, 0, 6, 0) };
-            bias        = new TextBlock { Text = "Bias: neutral", Margin = new Thickness(0, 0, 20, 0) };
-            dayType     = new TextBlock { Text = "Day: -", Margin = new Thickness(0, 0, 20, 0) };
-            confidence  = new TextBlock { Text = "Conf: -", Margin = new Thickness(0, 0, 20, 0) };
-            morph       = new TextBlock { Text = "Morph: low", Foreground = Brushes.DarkOrange };
+            lastUpdated = new TextBlock { Text = "Last Updated (ET): --:--:--", FontWeight = FontWeights.Bold, Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 20, 0) };
+            flag = new Border { Width = 16, Height = 16, Background = Brushes.Gray, Margin = new Thickness(0, 0, 8, 0) };
+            bias = new TextBlock { Text = "Bias: neutral", Margin = new Thickness(0, 0, 20, 0), Foreground = Brushes.LightGray };
+            dayType = new TextBlock { Text = "Day: -", Margin = new Thickness(0, 0, 20, 0), Foreground = Brushes.LightGray };
+            confidence = new TextBlock { Text = "Conf: -", Margin = new Thickness(0, 0, 20, 0), Foreground = Brushes.LightGray };
+            morph = new TextBlock { Text = "Morph: low", Foreground = new SolidColorBrush(Color.FromRgb(255, 152, 0)), FontWeight = FontWeights.Bold };
 
             header.Children.Add(lastUpdated);
             header.Children.Add(flag);
@@ -57,16 +55,23 @@ namespace NinjaTrader.NinjaScript.AddOns.Ui
             Grid.SetColumnSpan(header, 2);
             grid.Children.Add(header);
 
+            // Commentary (left)
             commentary = new TextBox
             {
                 AcceptsReturn = true,
                 IsReadOnly = true,
                 TextWrapping = TextWrapping.Wrap,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Background = new SolidColorBrush(Color.FromRgb(45, 45, 48)),  // Dark panel
+                Foreground = Brushes.White,
+                BorderBrush = Brushes.Gray,
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 12
             };
             Grid.SetRow(commentary, 1);
             grid.Children.Add(commentary);
 
+            // Right side
             var right = new Grid { Margin = new Thickness(10, 0, 0, 0) };
             right.RowDefinitions.Add(new RowDefinition { Height = new GridLength(2, GridUnitType.Star) });
             right.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
@@ -79,7 +84,12 @@ namespace NinjaTrader.NinjaScript.AddOns.Ui
                 AcceptsReturn = true,
                 IsReadOnly = true,
                 TextWrapping = TextWrapping.Wrap,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Background = new SolidColorBrush(Color.FromRgb(45, 45, 48)),
+                Foreground = Brushes.White,
+                BorderBrush = Brushes.Gray,
+                FontFamily = new FontFamily("Consolas"),
+                FontSize = 12
             };
 
             Grid.SetRow(dpoc, 0);
@@ -92,46 +102,36 @@ namespace NinjaTrader.NinjaScript.AddOns.Ui
             grid.Children.Add(right);
         }
 
-        private static Brush FlagBrush(string biasStr)
+        private Brush FlagBrush(string biasStr)
         {
             if (string.Equals(biasStr, "bullish", StringComparison.OrdinalIgnoreCase)) return Brushes.LimeGreen;
             if (string.Equals(biasStr, "bearish", StringComparison.OrdinalIgnoreCase)) return Brushes.Red;
-            return Brushes.Gold;
+            if (string.Equals(biasStr, "neutral", StringComparison.OrdinalIgnoreCase)) return Brushes.Goldenrod;
+            return Brushes.Gray;
         }
 
-        // Safe public API - always marshals to UI thread
-        public void UpdateUi(
-            DateTime et,
-            string sym,
-            string biasStr,
-            string dayTypeStr,
-            int conf,
-            string morphRisk,
-            IEnumerable<string> comments,
-            IEnumerable<string> ev,
-            IList<DpocPoint> trail)
+        public void UpdateUi(DateTime et, string sym, string biasStr, string dayTypeStr, int conf, string morphRisk,
+            IEnumerable<string> comments, IEnumerable<string> ev, IList<DpocPoint> trail)
         {
             this.Dispatcher.InvokeAsync(() =>
             {
                 lastUpdated.Text = "Last Updated (ET): " + et.ToString("HH:mm:ss") + " — " + sym;
-                flag.Background  = FlagBrush(biasStr);
-                bias.Text        = "Bias: " + biasStr;
-                dayType.Text     = "Day: " + dayTypeStr;
-                confidence.Text  = "Conf: " + conf;
-                morph.Text       = "Morph: " + morphRisk;
+                flag.Background = FlagBrush(biasStr);
+                bias.Text = "Bias: " + biasStr;
+                dayType.Text = "Day: " + dayTypeStr;
+                confidence.Text = "Conf: " + conf;
+                morph.Text = "Morph: " + morphRisk;
 
                 if (comments != null)
                 {
-                    foreach (var c in comments)
-                        commentary.AppendText("• " + c + Environment.NewLine);
+                    foreach (var c in comments) commentary.AppendText("• " + c + Environment.NewLine);
                     commentary.ScrollToEnd();
                 }
 
                 evidence.Clear();
                 if (ev != null)
                 {
-                    foreach (var x in ev)
-                        evidence.AppendText("• " + x + Environment.NewLine);
+                    foreach (var x in ev) evidence.AppendText("• " + x + Environment.NewLine);
                 }
 
                 _trail = trail;
@@ -144,13 +144,8 @@ namespace NinjaTrader.NinjaScript.AddOns.Ui
             dpoc.Children.Clear();
             if (_trail == null || _trail.Count < 2) return;
 
-            double min = double.MaxValue;
-            double max = double.MinValue;
-            for (int i = 0; i < _trail.Count; i++)
-            {
-                if (_trail[i].Price < min) min = _trail[i].Price;
-                if (_trail[i].Price > max) max = _trail[i].Price;
-            }
+            double min = double.MaxValue, max = double.MinValue;
+            foreach (var pt in _trail) { min = Math.Min(min, pt.Price); max = Math.Max(max, pt.Price); }
             if (Math.Abs(max - min) < 1e-9) { max += 1; min -= 1; }
 
             double w = dpoc.ActualWidth > 0 ? dpoc.ActualWidth : 400;

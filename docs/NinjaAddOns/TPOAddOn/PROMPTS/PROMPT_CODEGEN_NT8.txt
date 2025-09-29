@@ -1,30 +1,28 @@
-PROMPT_CODEGEN_NT8.txt
-======================
+# PROMPT_CODEGEN_NT8.txt
+Updated: 2025-09-29 02:59 
 
-Role: Senior .NET/NinjaTrader AddOn engineer.
+## Hard Rules for Codegen
+- No tuple generics; use Core DTOs.
+- Single definition of Node, SinglePrint, DpocPoint, ProfileSnapshot in Core.
+- UiHostWindow must be created on Application.Current.Dispatcher.Invoke + Show().
+- Do not use NTWindow.MainWindow.
+- Close UiHostWindow on its Dispatcher.BeginInvoke.
+- Keep code inside namespace; braces matched.
 
-Target platform: NinjaTrader 8 (NT8), WPF, C# (no reliance on new language features).
-
-Hard constraints (must follow):
-- Do NOT use C# tuple generics (e.g., List<(double,double)>), tuple literals, deconstruction, local functions, records.
-- Use DTO classes instead: Node{Price, Score}, SinglePrint{Start, End}, DpocPoint{Et, Price}, ProfileSnapshot{Poc, Vah, Val, TotalTpos, HVN:List<Node>, LVN:List<Node>, Singles:List<SinglePrint>, PoorHigh, PoorLow}.
-- Ensure exactly ONE definition for each DTO in Core. Reuse them everywhere via:
-    using NinjaTrader.NinjaScript.AddOns.Core;
-- All WPF windows/controls must be created and accessed ONLY on the UI thread:
-    - Create windows on Application.Current.Dispatcher.Invoke(...).
-    - Update controls via this.Dispatcher.InvokeAsync(...).
-    - Close windows via window.Dispatcher.BeginInvoke(...).
-- Every .cs file must live inside a namespace and compile on NT8's C# compiler.
-- Keep '#region/#endregion' balanced or avoid them entirely.
-- Prefer compatibility over novelty; no modern sugar that NT8 may not support.
-
-Patterns to follow:
-- UiHostWindow : NTWindow (no XAML). Construct all UI in code-behind safely.
-- In AddOn Start(): marshal UiHostWindow creation to Application.Current.Dispatcher.
-- In Stop(): close UiHostWindow via its Dispatcher.
-- No static initialization that touches WPF controls at load time.
-
-Code review gates:
-- Lint for tuples, Add((a,b)) patterns, and dispatcher-unsafe window creation.
-- Avoid stray top-level code outside namespace/class.
-- Keep JSON schema stable; bump versions explicitly in code constants when needed.
+## Canonical Start() block
+```csharp
+var disp = Application.Current != null ? Application.Current.Dispatcher : null;
+if (disp != null)
+{
+    disp.Invoke(new Action(() =>
+    {
+        ui = new UiHostWindow();
+        ui.Show();
+    }));
+}
+else
+{
+    ui = new UiHostWindow();
+    ui.Show();
+}
+```
