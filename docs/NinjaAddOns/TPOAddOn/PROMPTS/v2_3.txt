@@ -1,0 +1,137 @@
+# Create V9.4.3 NinjaAddon V2.3 — NT8-Compatible
+
+ROLE
+You are a senior / architect NinjaTrader 8 Add-On engineer and Auction Market Theory educator. Produce a single, compilable NinjaTrader 8 Add-On in C# that implements the COMPLETE “TPO Analysis v9.4.3 (FULL)” prompt locally, using live 5-minute OHLC bars from NinjaTrader’s BarsRequest API. Do not ask clarifying questions—assume all requirements are final and deliver the code and run instructions in one shot.
+
+OBJECTIVE
+Build a thread-safe NT8 Add-On that:
+1) Subscribes to NQ, ES, YM (##-## continuous or active expiry).
+2) Every 5-minute **closed** bar:
+   - Updates internal Auction/TPO state.
+   - Computes all metrics from TPO Analysis v9.4.3 (FULL).
+   - Stores structured results as JSON (machine-readable, verbose, forward-compatible).
+   - Emits human-readable tables and commentary (journal style).
+3) Minimal UI: Control Center “New” menu item toggles Start/Stop.
+4) Versioning (no version in names):
+   - Code constant: `VersionTag = "v9.4.3"`
+   - JSON: `"schemaVersion":"tpo.v9_4_3"`
+   - Class/folder names generic: **TPOAddon**, **NinjaAddOnTPO**
+   - Roadmap/README hold roadmap versions.
+
+DATA & SESSIONS
+- Inputs: 5m OHLC via **BarsRequest** (live and historical).
+- Trading hours: Prefer `TradingHours.Get("CME US Index Futures ETH")`; compute the RTH profile on the 09:30–16:00 ET segment. If ETH data present, compute optional ON session metrics.
+- Prior-day references: H/L, TPO VAH/POC/VAL (and Volume VA if available). Roll references at RTH close.
+- Missing inputs MUST degrade the confidence score with explicit `"degradedBy":[...]` reasons in JSON.
+
+METRICS TO IMPLEMENT (superset v9.3 → v9.4.2)
+- Opening location vs prior value/range.
+- Opening type (OD/OTD/ORR/OA).
+- Initial Balance (IB) tracking.
+- Rolling 15-minute **dPOC** tracking (trail).
+- Full TPO value area (VAH, VAL, POC, 70% rule).
+- HVN/LVN arrays (track acceptance/rejection).
+- Peer gap-close tracking (cross-index ES/NQ/YM).
+- Morphology detection (P-day, b-day, D-day, B-day).
+- Single prints, poor highs/lows, one-timeframing.
+- Day-type classification with morph logic.
+- Dynamic confidence scoring (weighted).
+- Educational playbooks (gap-and-go, IB breakout continue/fail, failed auction, double distribution).
+
+OUTPUTS
+- Base path: `NinjaTrader.Core.Globals.UserDataDir\NinjaAddOn\TPOAddon\`
+- Files:
+  - JSONL: one entry per 5m **closed** bar.
+  - Session summary JSON (at RTH close).
+  - Latest snapshot JSON (atomic write).
+  - Journal text log (human-readable commentary and table rows).
+- Output window:
+  - Human-readable table of VAH/POC/VAL, IB, day-type, confidence.
+  - Scenario commentary (playbook triggers).
+
+THREAD-SAFETY REQUIREMENTS
+- UI marshaling via Dispatcher; never update WPF controls off the UI thread.
+- Protect shared state with a `stateLock`; serialize file I/O with a `fileLock` and atomic “.tmp then move” writes for latest snapshot.
+- Use `Interlocked` for counters as needed.
+- Clean shutdown: unsubscribe BarsRequest.Update, Cancel/Dispose requests, guard against in-flight updates.
+
+BAR-PROCESSING RULES
+- **Process only CLOSED bars**: for a BarsSeries `series`, the latest closed index is `series.Count - 2`.
+- Iterate from `start = Max(e.MinIndex, lastProcessed+1)` to `end = Min(e.MaxIndex, series.Count-2)`.
+- Track `lastProcessedIndex` per instrument.
+- Incrementally update Auction/TPO structures each bar (no full recompute intra-day).
+- At RTH boundaries (09:30/16:00 ET), finalize the session profile and roll forward references.
+
+UI REQUIREMENTS (basic for now)
+- Text field: last time updated (ET).
+- Text box: human-readable output (journal-style; **no JSON echo**).
+- Bias widget: bullish/bearish/neutral with green/red/yellow.
+- Widget: day-type classification.
+- Text box: evidence.
+- Graph: developing POC migration (use a simple lightweight Canvas polyline).
+- Confidence score from JSON.
+- Morph warning widget (with supporting evidence text).
+
+================================================================================
+NT8 COMPILER COMPATIBILITY (LESSONS LEARNED — **MANDATORY**)
+================================================================================
+The NinjaTrader 8 compiler rejects many modern C# features. **Follow these rules:**
+
+A) **Language Features — Allowed vs. Forbidden**
+- ✅ Allowed: classic C# 6/7–style code.
+- ❌ Forbidden (do NOT use):
+  - Tuple types or named tuples: `List<(double price,double score)>` → **use small structs/classes**.
+  - Target-typed `new()` (e.g., `var x = new()`).
+  - Index-from-end and ranges: `^1`, `..`, `Index`, `Range`.
+  - Records, `with` expressions, default interface methods.
+  - Pattern matching beyond simple `is` checks and `switch` cases compatible with C#7.
+  - `System.Text.Json` serialization (prefer `StringBuilder` to emit JSON).
+
+B) **Explicit Types Everywhere**
+- Use `new List<T>()`, `new Dictionary<TKey,TValue>(StringComparer.OrdinalIgnoreCase)` (no target-typed new).
+- Define lightweight containers instead of tuples, e.g.:
+  ```csharp
+  internal struct LevelScore { public double Price; public double Score; public LevelScore(double p,double s){ Price=p; Score=s; } }
+  internal struct RangeBand { public double Start; public double End; public RangeBand(double a,double b){ Start=a; End=b; } }
+  internal sealed class DpocPoint { public DateTime Et; public double Price; public DpocPoint(DateTime et,double p){ Et=et; Price=p; } }
+  ```
+
+C) **BarsRequest Usage (NT8 API Correctness)**
+- Subscribe with `BarsRequest` and handle **`Update += OnBarsUpdate`**.
+- Signature: `private void OnBarsUpdate(object sender, BarsUpdateEventArgs e)`.
+- Use `var series = e.BarsSeries;` then `series.GetOpen/High/Low/Close(i)` and `series.GetTime(i)`.
+- Iterate **only** `i ∈ [start..end]` where `end = series.Count - 2` to avoid processing the still-forming bar.
+
+D) **No Duplicate Types**
+- Keep a **single** definition of shared models (e.g., `ProfileSnapshot`) in one file (e.g., `ProfileBuilder.cs`). Do not redeclare in other files.
+
+E) **File Packaging Truths (NinjaTrader Import)**
+- The importer often rejects hand-built zips even with perfect `bin/Custom/...` structure.
+- **Development workflow:** copy source files to `Documents\NinjaTrader 8\bin\Custom\AddOns\TPOAddon\`, compile inside NinjaTrader.
+- **Distribution workflow:** from your NinjaTrader, use **Tools → Export → NinjaScript Add-On** to produce the official importable archive.
+- If you still build a local zip, ensure the root is **exactly** `bin/` and include **only `.cs` files** (docs frequently cause rejection).
+
+F) **JSON Emission**
+- Build JSON manually with `StringBuilder` (no external serializers). Write `.tmp` then atomic move for `latest.json`.
+
+G) **Time Zones**
+- Convert incoming UTC bar timestamps to ET for display/roll logic.
+- Use a helper (`ClockEt`) to avoid DST pitfalls.
+
+DELIVERABLES
+1) Brief run instructions (≤ 8 lines).
+2) Complete, compilable NinjaTrader 8 Add-On C# code (no placeholders).
+3) Code includes:
+   - Full TPO logic per v9.4.3.
+   - JSON writer + journal logger.
+   - Thread-safe design (locks + dispatcher + atomic writes).
+   - UI widgets as specified.
+4) **Packaging helpers (for dev convenience):**
+   - `install_local.bat` / `install_local.ps1` to copy sources into `Documents\NinjaTrader 8\bin\Custom\AddOns\TPOAddon` and compile in-place.
+   - `build_ninjazip.bat` to produce a `bin/`-rooted zip (note: use NT Export for final distribution).
+
+FUTURE-USE CONSIDERATIONS
+- JSON will be consumed by indicators for LVN/HVN/POC/VAH/VAL, IB, B-day inflection points.
+- Keep JSON **verbose and stable** (arrays/objects, not bare scalars; include `tickSize`, `pointValue` if known).
+- Provide `latest.json` for low-latency consumers.
+- ROADMAP.md tracks features & versions (V2.3 baseline includes compiler compatibility constraints).

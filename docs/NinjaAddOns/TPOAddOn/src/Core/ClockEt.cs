@@ -1,15 +1,46 @@
-
-#region Using declarations
 using System;
+
+using NinjaTrader.NinjaScript.AddOns.Core;
+
 namespace NinjaTrader.NinjaScript.AddOns.Core
 {
-    internal static class ClockEt
+    public static class ClockEt
     {
-        private static readonly TimeZoneInfo EtTz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
-        public static DateTime ToEt(DateTime utc){ if(utc.Kind!=DateTimeKind.Utc) utc = DateTime.SpecifyKind(utc.ToUniversalTime(), DateTimeKind.Utc); return TimeZoneInfo.ConvertTimeFromUtc(utc, EtTz); }
-        public static string HM(DateTime et) => et.ToString("HH:mm");
-        public static string HMS(DateTime et) => et.ToString("HH:mm:ss");
-        public static int GetEtOffsetMinutes(DateTime utc){ var et=ToEt(utc); return (int)(et-utc).TotalMinutes; }
-        public static bool IsDst(DateTime utc){ var et=ToEt(utc); return EtTz.IsDaylightSavingTime(et); }
-    }
+        public static DateTime NowEt()
+        {
+            try
+            {
+                return TimeZoneInfo.ConvertTime(DateTime.UtcNow,
+                    TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"));
+            }
+            catch
+            {
+                return DateTime.Now;
+            }
+        }
+    
+        public static DateTime ToEt(DateTime utc)
+        {
+            try
+            {
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+                if (utc.Kind == DateTimeKind.Local)
+                    return TimeZoneInfo.ConvertTime(utc, tz);
+                if (utc.Kind == DateTimeKind.Unspecified)
+                    return TimeZoneInfo.ConvertTime(utc, tz);
+                return TimeZoneInfo.ConvertTimeFromUtc(utc, tz);
+            }
+            catch
+            {
+                return utc.ToLocalTime();
+            }
+        }
+
+        public static string HM(DateTime t)
+        {
+            try { return t.ToString("HH:mm"); }
+            catch { return ""; }
+        }
+    
+}
 }
