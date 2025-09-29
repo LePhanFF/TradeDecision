@@ -1,4 +1,3 @@
-// NinjaAddOnTPO.cs - runtime fixes: safe UpdateHeader + instrument resolution
 using System;
 using System.IO;
 using System.Linq;
@@ -9,15 +8,15 @@ using NinjaTrader.Cbi;
 using NinjaTrader.Gui;
 using NinjaTrader.Gui.Tools;
 using NinjaTrader.NinjaScript;
+using NinjaTrader.NinjaScript.AddOns;
 using NinjaTrader.NinjaScript.AddOns.Core;
 using NinjaTrader.NinjaScript.AddOns.Ui;
-using NinjaTrader.Core;
 
 namespace NinjaTrader.NinjaScript.AddOns
 {
     public class NinjaAddOnTPO : AddOnBase
     {
-        private const string VersionTag = "v9.4.4";
+        private const string VersionTag = "v2.4-CS5";
         private NTMenuItem menuItem;
         private bool isRunning = false;
 
@@ -26,40 +25,35 @@ namespace NinjaTrader.NinjaScript.AddOns
         private JsonStore store;
         private Journal journal;
         private UiHostWindow ui;
+        private Heartbeat hb;
 
-        // Default front-month fallbacks; can be overridden with instruments.txt
-        private readonly string[] defaultInstrumentNames = new string[] { "NQ 12-25", "ES 12-25", "YM 12-25" };
-        private readonly string baseDir = System.IO.Path.Combine(NinjaTrader.Core.Globals.UserDataDir, "NinjaAddOn", "TPOAddon");
+        private string BaseDir { get { return System.IO.Path.Combine(NinjaTrader.Core.Globals.UserDataDir, "NinjaAddOn", "TPOAddon"); } }
+        private string InstrumentsCfg { get { return System.IO.Path.Combine(BaseDir, "instruments.txt"); } }
 
         protected override void OnWindowCreated(Window w)
         {
-            var cc = w as ControlCenter; if (cc == null) return;
-            var newMenu = cc.FindFirst("ControlCenterMenuItemNew") as NTMenuItem; if (newMenu == null) return;
+            ControlCenter cc = w as ControlCenter; if (cc == null) return;
+            NTMenuItem newMenu = cc.FindFirst("ControlCenterMenuItemNew") as NTMenuItem; if (newMenu == null) return;
 
             if (menuItem == null)
             {
-                menuItem = new NTMenuItem
-                {
-                    Header = "NinjaAddOn TPO " + VersionTag,
-                    Style = Application.Current.TryFindResource("MainMenuItem") as Style
-                };
-                menuItem.Click += (s, e) => { if (!isRunning) Start(); else Stop(); };
+                menuItem = new NTMenuItem();
+                menuItem.Header = "NinjaAddOn TPO " + VersionTag;
+                menuItem.Style = Application.Current != null ? Application.Current.TryFindResource("MainMenuItem") as Style : null;
+                menuItem.Click += delegate(object s, RoutedEventArgs e) { if (!isRunning) Start(); else Stop(); };
                 newMenu.Items.Add(menuItem);
             }
         }
 
         protected override void OnWindowDestroyed(Window w)
         {
-            var cc = w as ControlCenter; if (cc == null) return;
-
+            ControlCenter cc = w as ControlCenter; if (cc == null) return;
             if (menuItem != null)
             {
-                var newMenu = cc.FindFirst("ControlCenterMenuItemNew") as NTMenuItem;
-                if (newMenu != null && newMenu.Items.Contains(menuItem))
-                    newMenu.Items.Remove(menuItem);
+                NTMenuItem newMenu = cc.FindFirst("ControlCenterMenuItemNew") as NTMenuItem;
+                if (newMenu != null && newMenu.Items.Contains(menuItem)) newMenu.Items.Remove(menuItem);
                 menuItem = null;
             }
-
             if (isRunning) Stop();
         }
 
@@ -67,48 +61,46 @@ namespace NinjaTrader.NinjaScript.AddOns
         {
             try
             {
-                System.IO.Directory.CreateDirectory(baseDir);
-                store = new JsonStore(baseDir);
-                journal = new Journal(baseDir);
-                peers = new PeersModel();
+                Directory.CreateDirectory(BaseDir);
+                TpoLogger.Init(BaseDir);
 
-                // Create UI window on WPF UI thread
-                var disp = Application.Current != null ? Application.Current.Dispatcher : null;
-                if (disp != null)
-                {
-                    disp.Invoke(new Action(() =>
-                    {
-                        ui = new UiHostWindow();
-                        ui.Show();
-                    }));
-                }
-                else
+                store   = new JsonStore(BaseDir);
+                journal = new Journal(BaseDir);
+                peers   = new PeersModel();
+
+                UiThread.Invoke(delegate()
                 {
                     ui = new UiHostWindow();
                     ui.Show();
-                }
+                });
+
+                hb = new Heartbeat(TimeSpan.FromSeconds(30), delegate() { TpoLogger.Info("hb"); });
+                hb.Start();
 
                 engine = new DataEngine();
                 engine.BarComputed += OnBar;
 
-                // Resolve instruments (config -> fallback)
-                var instruments = ResolveInstruments();
-                if (instruments.Count == 0)
-                {
-                    SafeOut("[TPO] No instruments resolved. Create " + System.IO.Path.Combine(baseDir, "instruments.txt") + " with one symbol per line (e.g., 'NQ 12-25').");
-                }
+                List<Instrument> instruments = ResolveInstruments();
+                if (instruments.Count == 0) TpoLogger.Warn("No instruments resolved. Provide 'instruments.txt'.");
                 else
                 {
                     engine.Start(instruments);
+                    try
+                    {
+                        List<string> names = new List<string>();
+                        for (int i = 0; i < instruments.Count; i++) names.Add(instruments[i].FullName);
+                        TpoLogger.Info("Engine started for: " + string.Join(", ", names.ToArray()));
+                    }
+                    catch { }
                 }
 
                 isRunning = true;
                 UpdateHeader();
-                SafeOut("[TPO] Started " + VersionTag);
+                TpoLogger.Info("AddOn Started " + VersionTag);
             }
             catch (Exception ex)
             {
-                SafeOut("[TPO] Start exception: " + ex.Message);
+                TpoLogger.Error("Start exception: " + ex.Message);
             }
         }
 
@@ -119,270 +111,120 @@ namespace NinjaTrader.NinjaScript.AddOns
                 isRunning = false;
                 UpdateHeader();
 
-                if (engine != null)
-                {
-                    engine.BarComputed -= OnBar;
-                    engine.Stop();
-                    engine = null;
-                }
+                if (engine != null) { engine.BarComputed -= OnBar; engine.Stop(); engine = null; }
+
+                if (hb != null) { hb.Dispose(); hb = null; }
 
                 if (ui != null)
                 {
-                    ui.Dispatcher.BeginInvoke(new Action(() => { try { ui.Close(); } catch { } }));
+                    UiThread.BeginInvoke(delegate() { try { ui.Close(); } catch { } });
                     ui = null;
                 }
 
-                SafeOut("[TPO] Stopped.");
+                TpoLogger.Info("AddOn Stopped.");
             }
             catch (Exception ex)
             {
-                SafeOut("[TPO] Stop exception: " + ex.Message);
+                TpoLogger.Error("Stop exception: " + ex.Message);
             }
         }
 
-        // NEW: Always marshal via the menu item's own Dispatcher and guard against shutdown
         private void UpdateHeader()
         {
             string h = isRunning ? "Stop NinjaAddOn TPO " + VersionTag : "NinjaAddOn TPO " + VersionTag;
-            var mi = menuItem;
-            if (mi == null) return;
-
-            var d = mi.Dispatcher != null ? mi.Dispatcher : (Application.Current != null ? Application.Current.Dispatcher : null);
-            if (d == null) return;
-            if (d.HasShutdownStarted || d.HasShutdownFinished) return;
-
-            if (d.CheckAccess())
-            {
-                try { mi.Header = h; } catch (Exception ex) { SafeOut("[TPO] UpdateHeader direct error: " + ex.Message); }
-            }
-            else
-            {
-                d.BeginInvoke(new Action(() =>
-                {
-                    try { if (menuItem != null) menuItem.Header = h; } catch (Exception ex) { SafeOut("[TPO] UpdateHeader invoke error: " + ex.Message); }
-                }));
-            }
+            NTMenuItem mi = menuItem; if (mi == null) return;
+            UiThread.BeginInvoke(delegate() { try { if (menuItem != null) menuItem.Header = h; } catch { } });
         }
 
         private List<Instrument> ResolveInstruments()
         {
-            var list = new List<Instrument>();
-            string cfg = System.IO.Path.Combine(baseDir, "instruments.txt");
-            string[] names = defaultInstrumentNames;
+            List<Instrument> list = new List<Instrument>();
+            string[] names = ReadInstrumentNames();
+            for (int i = 0; i < names.Length; i++)
+            {
+                string raw = names[i];
+                try
+                {
+                    string sym = DataSubscriptions.ResolveFrontMonth(raw, DateTime.UtcNow);
+                    Instrument inst = Instrument.GetInstrument(sym);
+                    if (inst != null) list.Add(inst); else TpoLogger.Warn("Instrument not found: " + sym);
+                }
+                catch (Exception ex)
+                {
+                    TpoLogger.Warn("Resolve instrument failed for " + raw + ": " + ex.Message);
+                }
+            }
+            return list;
+        }
 
+        private string[] ReadInstrumentNames()
+        {
+            string[] defaults = new string[] { "NQ 12-25", "ES 12-25", "YM 12-25" };
             try
             {
-                if (File.Exists(cfg))
+                if (File.Exists(InstrumentsCfg))
                 {
-                    var raw = File.ReadAllLines(cfg);
-                    var cleaned = raw.Select(x => (x ?? string.Empty).Trim())
-                                     .Where(x => x.Length > 0 && !x.StartsWith("#"))
-                                     .Distinct(StringComparer.OrdinalIgnoreCase)
-                                     .ToArray();
-                    if (cleaned.Length > 0) names = cleaned;
+                    string[] raw = File.ReadAllLines(InstrumentsCfg);
+                    List<string> cleaned = new List<string>();
+                    for (int i = 0; i < raw.Length; i++)
+                    {
+                        string s = (raw[i] ?? string.Empty).Trim();
+                        if (s.Length == 0) continue;
+                        if (s.StartsWith("#")) continue;
+                        if (!cleaned.Contains(s)) cleaned.Add(s);
+                    }
+                    if (cleaned.Count > 0) return cleaned.ToArray();
                 }
             }
             catch (Exception ex)
             {
-                SafeOut("[TPO] Could not read instruments.txt: " + ex.Message);
+                TpoLogger.Warn("Could not read instruments.txt: " + ex.Message);
             }
-
-            foreach (var n in names)
-            {
-                try
-                {
-                    var inst = Instrument.GetInstrument(n);
-                    if (inst != null)
-                    {
-                        list.Add(inst);
-                    }
-                    else
-                    {
-                        SafeOut("[TPO] Instrument not found: " + n);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    SafeOut("[TPO] Resolve instrument failed for " + n + ": " + ex.Message);
-                }
-            }
-            return list;
+            return defaults;
         }
 
         private void OnBar(object sender, BarComputedEventArgs e)
         {
             try
             {
-                // Cross-index peer tracking
                 peers.ObserveBar(e.Symbol, e.H, e.L);
-                Dictionary<string, bool> peersClosed = peers.SnapshotGapClosed();
+                Dictionary<string,bool> peersClosed = peers.SnapshotGapClosed();
 
-                // Score
                 Classifier clf = new Classifier(0.25);
                 CallDecision call = clf.ScoreCall(e.Opening, e.IB, e.Profile, e.Otf, peersClosed, "");
 
-                // Journal (safe)
                 journal.Append(
-                    e.Symbol,
-                    e.Et,
+                    e.Symbol, e.Et,
                     string.Format(
-                        "{0} {1} Bias={2} Day={3} Conf={4} IB[{5:0.00}/{6:0.00}] dPOC={7:0.00} VA[{8:0.00}/{9:0.00}/{10:0.00}] Singles:{11} OTF:{12}({13}) Morph:low",
+                        "{0} {1} Bias={2} Day={3} Conf={4} IB[{5:0.00}/{6:0.00}] dPOC={7:0.00} VA[{8:0.00}/{9:0.00}/{10:0.00}] Singles:{11} OTF:{12}({13})",
                         e.Et.ToString("HH:mm"),
                         e.Symbol,
                         call.Bias,
                         call.DayType,
                         call.Confidence,
-                        e.IB.High,
-                        e.IB.Low,
-                        e.Profile.Poc,
-                        e.Profile.Val,  // VAL
-                        e.Profile.Poc,  // POC (display middle)
-                        e.Profile.Vah,  // VAH
+                        e.IB.High, e.IB.Low, e.Profile.Poc, e.Profile.Val, e.Profile.Poc, e.Profile.Vah,
                         (e.Profile.Singles != null ? e.Profile.Singles.Count : 0),
                         (e.Otf.Up ? "Up" : (e.Otf.Down ? "Down" : "-")),
                         e.Otf.Frame
                     )
                 );
 
-                var inv = System.Globalization.CultureInfo.InvariantCulture;
-                var json = new StringBuilder(4096);
-
-                json.Append("{\"schemaVersion\":\"tpo.v9_4_4\",\"type\":\"bar\"");
-                json.Append(",\"ts_utc\":\"").Append(e.Utc.ToString("yyyy-MM-ddTHH:mm:00Z")).Append("\"");
-                json.Append(",\"ts_et\":\"").Append(e.Et.ToString("yyyy-MM-ddTHH:mm:00")).Append("\"");
-                json.Append(",\"sessionId\":\"").Append(e.SessionId).Append("\"");
-                json.Append(",\"instrument\":{\"symbol\":\"").Append(e.Symbol).Append("\",\"fullName\":\"").Append(e.FullName).Append("\"}");
-                json.Append(",\"bar\":{\"o\":").Append(e.O.ToString(inv)).Append(",\"h\":").Append(e.H.ToString(inv)).Append(",\"l\":").Append(e.L.ToString(inv)).Append(",\"c\":").Append(e.C.ToString(inv)).Append("}");
-                json.Append(",\"context\":{\"rthPhase\":\"RTH\",\"sinceOpenMin\":").Append(e.IB.SinceOpenMin)
-                    .Append(",\"gap\":{\"dir\":\"").Append(e.Opening.Dir).Append("\",\"ticks\":").Append(e.Opening.GapTicks).Append("}")
-                    .Append(",\"opening\":{\"location\":\"").Append(e.Opening.Location).Append("\",\"type\":\"").Append(e.Opening.Type).Append("\"}}");
-
-                // IB
-                json.Append(",\"ib\":{\"high\":").Append((double.IsNaN(e.IB.High) ? 0 : e.IB.High).ToString(inv))
-                    .Append(",\"low\":").Append((double.IsNaN(e.IB.Low) ? 0 : e.IB.Low).ToString(inv))
-                    .Append(",\"extensions\":{\"up\":").Append(e.IB.ExtUpCount).Append(",\"down\":").Append(e.IB.ExtDownCount).Append("}}");
-
-                // Profile (TPO / HVN / LVN / Singles / Poor)
-                json.Append(",\"profile\":{\"tpo\":{\"poc\":").Append(e.Profile.Poc.ToString(inv))
-                    .Append(",\"vah\":").Append(e.Profile.Vah.ToString(inv))
-                    .Append(",\"val\":").Append(e.Profile.Val.ToString(inv))
-                    .Append(",\"totalTpos\":").Append(e.Profile.TotalTpos).Append("}");
-
-                // HVN
-                json.Append(",\"hvn\":[");
-                if (e.Profile.HVN != null)
+                UiThread.BeginInvoke(delegate()
                 {
-                    for (int i = 0; i < e.Profile.HVN.Count; i++)
+                    if (ui != null)
                     {
-                        if (i > 0) json.Append(',');
-                        json.Append("{\"price\":").Append(e.Profile.HVN[i].Price.ToString(inv))
-                            .Append(",\"score\":").Append(e.Profile.HVN[i].Score.ToString(inv)).Append("}");
+                        ui.UpdateUi(
+                            e.Et, e.Symbol, call.Bias, call.DayType, call.Confidence, "low",
+                            new string[] { "POC " + e.Profile.Poc.ToString("0.00") + ", VA [" + e.Profile.Val.ToString("0.00") + "/" + e.Profile.Vah.ToString("0.00") + "]" },
+                            new string[] { "Opening " + e.Opening.Type + ", IB[" + e.IB.High.ToString("0.00") + "/" + e.IB.Low.ToString("0.00") + "]" },
+                            e.DPocTrail
+                        );
                     }
-                }
-                json.Append("]");
-
-                // LVN
-                json.Append(",\"lvn\":[");
-                if (e.Profile.LVN != null)
-                {
-                    for (int i = 0; i < e.Profile.LVN.Count; i++)
-                    {
-                        if (i > 0) json.Append(',');
-                        json.Append("{\"price\":").Append(e.Profile.LVN[i].Price.ToString(inv))
-                            .Append(",\"score\":").Append(e.Profile.LVN[i].Score.ToString(inv)).Append("}");
-                    }
-                }
-                json.Append("]");
-
-                // Singles
-                json.Append(",\"singles\":[");
-                if (e.Profile.Singles != null)
-                {
-                    for (int i = 0; i < e.Profile.Singles.Count; i++)
-                    {
-                        if (i > 0) json.Append(',');
-                        json.Append("{\"start\":").Append(e.Profile.Singles[i].Start.ToString(inv))
-                            .Append(",\"end\":").Append(e.Profile.Singles[i].End.ToString(inv)).Append("}");
-                    }
-                }
-                json.Append("]");
-
-                // Poor
-                json.Append(",\"poor\":{\"high\":")
-                    .Append(e.Profile.PoorHigh ? "true" : "false")
-                    .Append(",\"low\":")
-                    .Append(e.Profile.PoorLow ? "true" : "false")
-                    .Append("}"); // end poor
-
-                json.Append("}"); // end profile
-
-                // Developing (dPOC + trail placeholder)
-                json.Append(",\"developing\":{\"dPoc\":").Append(e.Profile.Poc.ToString(inv)).Append(",\"dPocTrail\":[]}");
-
-                // Structure
-                json.Append(",\"structure\":{\"oneTimeframing\":{\"up\":")
-                    .Append(e.Otf.Up ? "true" : "false")
-                    .Append(",\"down\":")
-                    .Append(e.Otf.Down ? "true" : "false")
-                    .Append(",\"frame\":\"").Append(e.Otf.Frame).Append("\"}")
-                    .Append(",\"shape\":\"").Append(new Classifier(0.25).ShapeFromProfile(e.Profile)).Append("\"")
-                    .Append(",\"morph\":{\"risk\":\"low\",\"from\":\"\",\"to\":\"\",\"evidence\":[]}}");
-
-                // Peers coherence
-                double coh = 0.0;
-                if (peersClosed != null && peersClosed.Count > 0)
-                {
-                    int ok = 0;
-                    foreach (var v in peersClosed.Values) if (v) ok++;
-                    coh = (double)ok / (double)peersClosed.Count;
-                }
-                json.Append(",\"peers\":{\"coherenceScore\":").Append(coh.ToString(inv)).Append("}");
-
-                // Call decision
-                json.Append(",\"call\":{\"bias\":\"").Append(call.Bias)
-                    .Append("\",\"dayType\":\"").Append(call.DayType)
-                    .Append("\",\"confidence\":").Append(call.Confidence).Append(",\"reasons\":[],\"warnings\":[]}");
-
-                json.Append("}"); // end root
-
-                string js = json.ToString();
-                store.AppendBar(e.Symbol, e.Et, js);
-                store.WriteLatest(e.Symbol, js);
-
-                if (ui != null)
-                {
-                    ui.UpdateUi(
-                        e.Et,
-                        e.Symbol,
-                        call.Bias,
-                        call.DayType,
-                        call.Confidence,
-                        "low",
-                        new string[] { "POC " + e.Profile.Poc.ToString("0.00") + ", VA [" + e.Profile.Val.ToString("0.00") + "/" + e.Profile.Vah.ToString("0.00") + "]" },
-                        new string[] { "Opening " + e.Opening.Type + ", IB[" + e.IB.High.ToString("0.00") + "/" + e.IB.Low.ToString("0.00") + "]" },
-                        e.DPocTrail
-                    );
-                }
+                });
             }
             catch (Exception ex)
             {
-                SafeOut("[TPO] OnBar exception: " + ex.Message);
-            }
-        }
-
-        private void SafeOut(string s)
-        {
-            try
-            {
-                var d = (menuItem != null && menuItem.Dispatcher != null) ? menuItem.Dispatcher : (Application.Current != null ? Application.Current.Dispatcher : null);
-                if (d != null && !d.CheckAccess())
-                    d.BeginInvoke(new Action(() => { NinjaTrader.Code.Output.Process(s, PrintTo.OutputTab1); }));
-                else
-                    NinjaTrader.Code.Output.Process(s, PrintTo.OutputTab1);
-            }
-            catch
-            {
-                // last resort: swallow logging errors
+                TpoLogger.Error("OnBar exception: " + ex.Message);
             }
         }
     }
