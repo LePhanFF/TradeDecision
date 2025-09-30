@@ -1,0 +1,5 @@
+# instruments.txt.sample
+# Override default contracts. One per line:
+NQ 12-25
+ES 12-25
+YM 12-25

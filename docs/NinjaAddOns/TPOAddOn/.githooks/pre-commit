@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Git pre-commit hook for NT8 AddOn projects
+# Runs the linter before allowing a commit.
+
+echo "[pre-commit] Running NT8 linter..."
+PYTHON=python3
+if command -v python >/dev/null 2>&1; then
+  PYTHON=python
+fi
+
+$PYTHON tools/nt8_linter.py .
+status=$?
+if [ $status -ne 0 ]; then
+  echo "[pre-commit] Linter found issues (see above). Commit blocked."
+  exit 1
+fi
+
+echo "[pre-commit] Linter passed."
+exit 0

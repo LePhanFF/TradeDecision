@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "tpo.metrics.v9_4_4",
+  "generatedAtEt": "2025-09-29T12:35:00",
+  "primary": {
+    "symbol": "NQ 12-25"
+  },
+  "observers": [
+    {
+      "symbol": "ES 12-25"
+    },
+    {
+      "symbol": "YM 12-25"
+    }
+  ]
+}
